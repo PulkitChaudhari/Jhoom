@@ -5,13 +5,4 @@ import { Component } from '@angular/core';
   templateUrl: './jhoom.component.html',
   styleUrls: ['./jhoom.component.css'],
 })
-export class JhoomComponent {
-  JhoomComponent() {}
-
-  htmlTag: HTMLElement | null;
-
-  switchTheme() {
-    this.htmlTag = document.getElementById('htmlTag');
-    this.htmlTag!.className = this.htmlTag?.className == 'dark' ? '' : 'dark';
-  }
-}
+export class JhoomComponent {}

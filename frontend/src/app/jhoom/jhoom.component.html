@@ -1,23 +1,8 @@
-<div
-  class="fixed dark:bg-slate-800 w-screen h-14 grid grid-cols-3 inline-block align-middle"
->
-  <div class="items-center justify-start flex">
-    <button
-      class="rounded-full w-fit px-4 py-1 ml-5 bg-cyan-600 text-white"
-      (click)="switchTheme()"
-    >
-      Join new room
-    </button>
+<div class="dark:bg-slate-200 w-screen h-screen grid grid-cols-3">
+  <div class="dark:bg-slate-500 h-screen col-span-2 pt-14">
+    <app-video></app-video>
   </div>
-  <div class="items-center justify-center flex">
-    <p class="italic text-black dark:text-white">JHOOM</p>
-  </div>
-  <div class="items-center justify-end flex">
-    <button
-      class="rounded-full w-fit px-4 py-1 mr-5 bg-cyan-600 text-white"
-      (click)="switchTheme()"
-    >
-      Toggle theme
-    </button>
+  <div class="dark:bg-slate-400 h-screen col-span-1 pt-14">
+    <app-chat></app-chat>
   </div>
 </div>
