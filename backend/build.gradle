@@ -17,7 +17,11 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.testng:testng:7.1.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework:spring-websocket:6.1.0'
+	implementation 'org.springframework:spring-messaging:6.1.0'
+
 }
 
 tasks.named('bootBuildImage') {
