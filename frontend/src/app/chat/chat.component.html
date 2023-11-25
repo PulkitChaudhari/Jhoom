@@ -2,12 +2,18 @@
   <div class="justify-center w-full h-5/6 flex">
     <div class="bg-cyan-600 w-5/6 h-full rounded-lg shadow-lg"></div>
   </div>
-  <!-- <div *ngFor="let msg of messages">
-    {{ msg }}
+  <input
+    class="form-control"
+    type="text"
+    placeholder="message"
+    [(ngModel)]="input"
+  />
+  <button class="btn btn-success" (click)="sendMessage()">Send</button>
+  <div class="content">
+    <!-- <div *ngFor="let msg of messageService.msg">
+      {{ msg }}
+    </div> -->
   </div>
-
-  <input [(ngModel)]="message" />
-  <button (click)="sendMessage()">Send</button> -->
 
   <div class="flex justify-center mt-5">
     <button

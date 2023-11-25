@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { WebSocketService } from '../common/websocketservice';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { MessageService } from '../common/websocket.service';
 
 @Component({
   selector: 'app-chat',
@@ -9,15 +10,19 @@ import { WebSocketService } from '../common/websocketservice';
 export class ChatComponent {
   message: string;
   messages: string[] = [];
-
-  constructor(private webSocketService: WebSocketService) {
-    this.webSocketService.getMessage().subscribe((message: string) => {
-      this.messages.push(message);
-    });
+  input: any;
+  constructor(private messageService: MessageService) {}
+  sendMessage() {
+    if (this.input) {
+      this.messageService.sendMessage(this.input);
+      this.input = '';
+    }
   }
 
-  sendMessage(): void {
-    this.webSocketService.sendMessage(this.message);
-    this.message = '';
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.sendMessage();
+    }
   }
 }
