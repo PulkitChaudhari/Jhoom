@@ -7,10 +7,20 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Vector;
 
 public class ChannelInterceptorConfig implements ChannelInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelInterceptorConfig.class);
+
+    private Vector<String> messages;
+
+    @Override
+    public Message<?> postReceive(Message<?> message, MessageChannel channel) {
+        String payloadAsString = new String((byte[]) message.getPayload(), StandardCharsets.UTF_8);
+        this.messages.add(payloadAsString);
+        return message;
+    }
 
     @Override
     public void postSend(Message<?> message, MessageChannel channel, boolean sent) {

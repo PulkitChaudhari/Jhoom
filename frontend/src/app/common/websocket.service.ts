@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 declare var SockJS: new (arg0: any) => any;
 declare var Stomp: { over: (arg0: any) => any };
 import { environment } from '../environment/environment';
+import { BehaviorSubject } from 'rxjs';
+import { DataShareService } from '../Data Share Service/data.share.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  constructor() {
+  constructor(private dataShareService: DataShareService) {
     this.initializeWebSocketConnection();
   }
   public stompClient: any;
-  public msg = [];
+  public msg: any[] = [];
   initializeWebSocketConnection() {
     const serverUrl = environment.app_url;
     console.log(serverUrl);
@@ -23,6 +25,7 @@ export class MessageService {
       that.stompClient.subscribe('/message', (message: any) => {
         if (message.body) {
           console.log(message);
+          that.dataShareService.addMessage(message);
         }
       });
     });

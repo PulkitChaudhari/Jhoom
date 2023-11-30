@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import com.example.backend.model.MessageService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -11,11 +12,17 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final MessageService messageService;
+
+    public WebSocketConfig(MessageService messageService) {
+        this.messageService = messageService;
+    }
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
                 .setAllowedOrigins("http://localhost:4200","http://localhost:52918")
-                .addInterceptors(new WebSocketHandshakeInterceptor())
+                .addInterceptors(new WebSocketHandshakeInterceptor(this.messageService))
                 .withSockJS();
     }
     @Override

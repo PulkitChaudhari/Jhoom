@@ -9,6 +9,7 @@ import { VideoComponent } from './video/video.component';
 import { FormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { HttpClientModule } from '@angular/common/http';
+import { DataShareService } from './Data Share Service/data.share.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +21,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [DataShareService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
