@@ -4,15 +4,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { JhoomModule } from './jhoom/jhoom.module';
-import { ChatComponent } from './chat/chat.component';
-import { VideoComponent } from './video/video.component';
 import { FormsModule } from '@angular/forms';
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { HttpClientModule } from '@angular/common/http';
-import { DataShareService } from './Data Share Service/data.share.service';
+import { DataShareService } from './services/data.share.service';
+import { WelcomePageComponent } from './welcome-page/welcome-page.component';
+import { RouterModule, Routes } from '@angular/router';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, WelcomePageComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -20,8 +19,10 @@ import { DataShareService } from './Data Share Service/data.share.service';
     HttpClientModule,
     BrowserModule,
     FormsModule,
+    AppRoutingModule,
   ],
   providers: [DataShareService],
   bootstrap: [AppComponent],
+  exports: [RouterModule],
 })
 export class AppModule {}

@@ -1,7 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { MessageService } from '../common/websocket.service';
-import { DataShareService } from '../Data Share Service/data.share.service';
+import { MessageService } from '../services/websocket.service';
+import { DataShareService } from '../services/data.share.service';
 
 @Component({
   selector: 'app-chat',
@@ -10,7 +9,11 @@ import { DataShareService } from '../Data Share Service/data.share.service';
 })
 export class ChatComponent implements OnInit {
   message: string;
-  messages: any[] = ['hello1', 'hello2', 'hell3', 'hello4'];
+  userName: string;
+  peerId: string;
+
+  messages: any[] = [];
+
   input: any;
 
   constructor(
@@ -21,13 +24,26 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.dataShareService.messagesObs$.subscribe((value) => {
       console.log(value);
-      this.messages.push(value.body);
+      this.messages.push(JSON.parse(value));
+    });
+    this.dataShareService.userNameObs$.subscribe((value) => {
+      this.userName = value;
+    });
+    this.dataShareService.peerObs$.subscribe((value) => {
+      this.peerId = value;
     });
   }
 
   sendMessage() {
     if (this.input) {
-      this.messageService.sendMessage(this.input);
+      console.log({
+        message: this.input,
+        userName: this.userName,
+      });
+      this.messageService.sendMessage({
+        message: this.input,
+        userName: this.userName,
+      });
       this.input = '';
     }
   }
