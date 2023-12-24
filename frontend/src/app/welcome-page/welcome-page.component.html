@@ -48,7 +48,7 @@
         placeholder="Username"
         [(ngModel)]="userName"
       />
-      <button class="btn btn-success" (click)="joinMeeting()">Join</button>
+      <button class="btn btn-success" (click)="joinRoom()">Join</button>
     </div>
     <div class="flex flex-col gap-3" *ngIf="!isJoinARoomSelected">
       <input
@@ -57,7 +57,7 @@
         placeholder="Username"
         [(ngModel)]="userName"
       />
-      <button class="btn btn-success" (click)="joinMeeting()">Join</button>
+      <button class="btn btn-success" (click)="createRoom()">Join</button>
     </div>
   </div>
 </div>

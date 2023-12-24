@@ -1,15 +1,13 @@
 package com.example.backend.service;
 
-import com.example.backend.model.Message;
+import com.example.backend.model.User;
 import com.example.backend.respository.UserRepository;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Vector;
+import java.util.Optional;
 
-@Service
-public class UserService {
-
-    @Autowired
-    private UserRepository userRepository;
+public interface UserService {
+    boolean createUser(User user);
 }

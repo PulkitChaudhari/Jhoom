@@ -10,6 +10,6 @@ import java.util.Vector;
 @Service
 public class RoomService {
 
-    @Autowired
-    private RoomRepository roomRepository;
+//    @Autowired
+//    private RoomRepository roomRepository;
 }

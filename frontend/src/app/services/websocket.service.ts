@@ -36,7 +36,15 @@ export class MessageService {
   }
 
   sendMessage(userObj: any) {
-    console.log(userObj);
     this.stompClient.send('/app/send/message', {}, JSON.stringify(userObj));
+  }
+
+  createRoom(userObj: any) {
+    this.stompClient.send('/app/createRoom', {}, JSON.stringify(userObj));
+  }
+
+  joinRoom(details: string) {
+    console.log(details);
+    this.stompClient.send('/app/joinRoom', {}, JSON.stringify(details));
   }
 }

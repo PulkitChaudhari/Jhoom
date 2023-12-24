@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MessageService } from '../services/websocket.service';
 import { Router } from '@angular/router';
 import { DataShareService } from '../services/data.share.service';
@@ -8,7 +8,7 @@ import { DataShareService } from '../services/data.share.service';
   templateUrl: './welcome-page.component.html',
   styleUrls: ['./welcome-page.component.css'],
 })
-export class WelcomePageComponent {
+export class WelcomePageComponent implements OnInit {
   userName: any;
   roomId: any;
   isJoinARoomSelected: boolean = true;
@@ -19,6 +19,10 @@ export class WelcomePageComponent {
     private dataShareService: DataShareService
   ) {}
 
+  ngOnInit() {
+    this.messageService.initializeWebSocketConnection('hehe');
+  }
+
   switchMeetingJoiningMode(value: boolean): void {
     this.isJoinARoomSelected = value;
   }
@@ -28,5 +32,14 @@ export class WelcomePageComponent {
     if (this.messageService.initializeWebSocketConnection(this.userName)) {
       this.router.navigate(['chat']);
     } else console.log('Could not connect to the server');
+  }
+
+  joinRoom() {
+    this.messageService.joinRoom('heyy');
+  }
+
+  createRoom() {
+    const userObj = { username: this.userName };
+    this.messageService.createRoom(userObj);
   }
 }
