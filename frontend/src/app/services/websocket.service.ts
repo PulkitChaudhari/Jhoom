@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 declare var SockJS: new (arg0: any) => any;
 declare var Stomp: { over: (arg0: any) => any };
 import { environment } from '../environment/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { DataShareService } from '../services/data.share.service';
 
 @Injectable({
@@ -14,6 +14,8 @@ export class MessageService {
 
   private stompClient: any;
 
+  meetingRoomId: string;
+
   initializeWebSocketConnection(userName: string): boolean {
     const serverUrl = environment.app_url;
     const ws = new SockJS(serverUrl);
@@ -22,8 +24,12 @@ export class MessageService {
     const that = this;
     this.stompClient.connect({}, () => {
       isConnected = true;
-      this.stompClient.subscribe('/passport', (messages: any) => {
-        console.log(messages);
+      this.stompClient.subscribe('/passport', (message: any) => {
+        console.log(message);
+        this.meetingRoomId = message;
+      });
+      this.stompClient.subscribe('/tempoo', (message: any) => {
+        console.log(message);
       });
       that.stompClient.subscribe('/message', (message: any) => {
         if (message.body) {
@@ -31,6 +37,10 @@ export class MessageService {
           that.dataShareService.addMessage(message.body);
         }
       });
+      // const subscriptionAddess: string = '/user/pulkit/queue/private';
+      // this.stompClient.subscribe(subscriptionAddess, (message: any) => {
+      //   console.log(message);
+      // });
     });
     return isConnected;
   }
@@ -43,8 +53,7 @@ export class MessageService {
     this.stompClient.send('/app/createRoom', {}, JSON.stringify(userObj));
   }
 
-  joinRoom(details: string) {
-    console.log(details);
+  joinRoom(details: any) {
     this.stompClient.send('/app/joinRoom', {}, JSON.stringify(details));
   }
 }

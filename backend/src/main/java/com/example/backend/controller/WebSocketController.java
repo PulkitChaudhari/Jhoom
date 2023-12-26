@@ -13,7 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class WebSocketController {
@@ -29,13 +34,16 @@ public class WebSocketController {
     @Autowired
     private RoomService roomService;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     private final MessageService messageService;
     private final JSONParser parser;
 
     @Autowired
-    public WebSocketController(MessageService messageService) {
+    public WebSocketController(MessageService messageService, SimpMessagingTemplate messagingTemplate) {
         this.messageService = messageService;
         this.parser = new JSONParser();
+        this.messagingTemplate = messagingTemplate;
     }
 
     @MessageMapping("/send/message")
@@ -55,12 +63,15 @@ public class WebSocketController {
     public void createRoom(String details) throws ParseException {
         try {
             JSONObject userDetails = (JSONObject) this.parser.parse(details);
-            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"));
+            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"), (String) userDetails.get("peerId"));
             boolean result = this.jhoomUserService.createUser(newUser);
             if (result) {
                 Room newRoom = this.roomService.createRoom();
                 this.roomService.addJhoomUserToRoom(newUser,newRoom);
                 logger.info(newUser.getUserName() + " added to Room : ",newRoom.getRoomId());
+                this.messagingTemplate.convertAndSend("/passport", newRoom.getRoomId());
+                List<String> temp = this.roomService.returnUsers(newRoom);
+                this.messagingTemplate.convertAndSend("/tempoo",temp);
             }
             else logger.info("User already exists");
         }
@@ -70,7 +81,22 @@ public class WebSocketController {
     }
 
     @MessageMapping("/joinRoom")
-    public void joinRoom(String message) {
-        logger.info(message);
+    public void joinRoom(String details) throws ParseException {
+        logger.info(details);
+        try {
+            JSONObject userDetails = (JSONObject) this.parser.parse(details);
+            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"), (String) userDetails.get("peerId"));
+            boolean result = this.jhoomUserService.createUser(newUser);
+            if (result) {
+                Room newRoom = this.roomService.findRoom((String) userDetails.get("roomId"));
+                this.roomService.addJhoomUserToRoom(newUser,newRoom);
+                Room newRoom1 = this.roomService.findRoom((String) userDetails.get("roomId"));
+                this.messagingTemplate.convertAndSend("/tempoo",newRoom1);
+            }
+            else logger.info("User already exists");
+        }
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

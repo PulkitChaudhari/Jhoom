@@ -1,14 +1,10 @@
 package com.example.backend.model;
 
-import jakarta.persistence.ForeignKey;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ public class Room {
     @Id
     String roomId;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     List<JhoomUser> users;
 
     public Room(String roomId) {

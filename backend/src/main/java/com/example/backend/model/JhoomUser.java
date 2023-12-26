@@ -17,4 +17,6 @@ public class JhoomUser {
 
     @Id
     private String userName;
+
+    private String peerId;
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MessageService } from '../services/websocket.service';
 import { Router } from '@angular/router';
 import { DataShareService } from '../services/data.share.service';
+import { PeerService } from '../services/peerjs.service';
 
 @Component({
   selector: 'app-welcome-page',
@@ -16,7 +17,8 @@ export class WelcomePageComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private router: Router,
-    private dataShareService: DataShareService
+    private dataShareService: DataShareService,
+    private peerService: PeerService
   ) {}
 
   ngOnInit() {
@@ -35,11 +37,20 @@ export class WelcomePageComponent implements OnInit {
   }
 
   joinRoom() {
-    this.messageService.joinRoom('heyy');
+    const peerId = this.peerService.getPeerId();
+    const userObj = {
+      username: this.userName,
+      peerId: peerId,
+      roomId: this.roomId,
+    };
+    this.messageService.joinRoom(userObj);
+    this.router.navigate(['chat']);
   }
 
   createRoom() {
-    const userObj = { username: this.userName };
+    const peerId = this.peerService.getPeerId();
+    const userObj = { username: this.userName, peerId: peerId };
     this.messageService.createRoom(userObj);
+    this.router.navigate(['chat']);
   }
 }

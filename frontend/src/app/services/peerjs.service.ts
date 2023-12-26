@@ -12,10 +12,10 @@ export class PeerService {
   constructor() {
     this.peer = new Peer(); // You can pass options here if needed
 
-    // this.peer.on('open', (id) => {
-    //   this.peerId = id;
-    //   console.log('My peer ID is: ' + id);
-    // });
+    this.peer.on('open', (id) => {
+      this.peerId = id;
+      console.log('My peer ID is: ' + id);
+    });
 
     // this.peer.on('error', (err) => {
     //   console.error(err);
