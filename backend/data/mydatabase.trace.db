@@ -1,0 +1,6 @@
+2023-12-26 14:26:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_name from [*]user u1_0 where u1_0.user_name=?"; expected "identifier"; SQL statement:
+select u1_0.user_name from user u1_0 where u1_0.user_name=? [42001-214]
+2023-12-26 14:28:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_name from [*]user u1_0 where u1_0.user_name=?"; expected "identifier"; SQL statement:
+select u1_0.user_name from user u1_0 where u1_0.user_name=? [42001-214]

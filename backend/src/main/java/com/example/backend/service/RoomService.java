@@ -1,15 +1,12 @@
 package com.example.backend.service;
 
-import com.example.backend.model.Message;
-import com.example.backend.respository.RoomRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.model.JhoomUser;
+import com.example.backend.model.Room;
 import org.springframework.stereotype.Service;
 
-import java.util.Vector;
+public interface RoomService {
 
-@Service
-public class RoomService {
+    Room createRoom ();
 
-//    @Autowired
-//    private RoomRepository roomRepository;
+    boolean addJhoomUserToRoom (JhoomUser jhoomUser, Room room);
 }

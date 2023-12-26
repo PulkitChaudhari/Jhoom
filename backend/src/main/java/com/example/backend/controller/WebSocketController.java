@@ -1,8 +1,10 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.User;
+import com.example.backend.model.JhoomUser;
+import com.example.backend.model.Room;
+import com.example.backend.service.JhoomUserService;
 import com.example.backend.service.MessageService;
-import com.example.backend.service.UserService;
+import com.example.backend.service.RoomService;
 import com.example.backend.service.WebSocketService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -12,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
-import com.example.backend.service.UserService;
 
 @Controller
 public class WebSocketController {
@@ -20,10 +21,13 @@ public class WebSocketController {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
 
     @Autowired
-    private UserService userService;
+    private JhoomUserService jhoomUserService;
 
     @Autowired
     private WebSocketService webSocketService;
+
+    @Autowired
+    private RoomService roomService;
 
     private final MessageService messageService;
     private final JSONParser parser;
@@ -49,12 +53,16 @@ public class WebSocketController {
 
     @MessageMapping("/createRoom")
     public void createRoom(String details) throws ParseException {
-        logger.info(details);
         try {
             JSONObject userDetails = (JSONObject) this.parser.parse(details);
-            User newUser = new User((String) userDetails.get("username"));
-            boolean result = this.userService.createUser(newUser);
-            logger.info(String.valueOf(result));
+            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"));
+            boolean result = this.jhoomUserService.createUser(newUser);
+            if (result) {
+                Room newRoom = this.roomService.createRoom();
+                this.roomService.addJhoomUserToRoom(newUser,newRoom);
+                logger.info(newUser.getUserName() + " added to Room : ",newRoom.getRoomId());
+            }
+            else logger.info("User already exists");
         }
         catch (ParseException e) {
             throw new RuntimeException(e);

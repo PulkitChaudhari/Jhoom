@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -17,11 +17,11 @@ public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long messageID;
 
     @ManyToOne
     @JoinColumn(name = "user_username", nullable = false)
-    private User user;
+    private JhoomUser jhoomUser;
 
     private LocalDateTime time;
 
