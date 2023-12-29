@@ -2,16 +2,15 @@ package com.example.backend.service;
 
 import com.example.backend.model.JhoomUser;
 import com.example.backend.model.Room;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 public interface RoomService {
 
-    Room createRoom ();
+    String createRoom ();
 
-    List<String> returnUsers(Room room);
-    boolean addJhoomUserToRoom (JhoomUser jhoomUser, Room room);
+    List<String> returnUsers(String room);
+    boolean addJhoomUserToRoom (JhoomUser jhoomUser, String roomId);
 
     Room findRoom(String roomId);
 }

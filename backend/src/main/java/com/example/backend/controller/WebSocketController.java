@@ -16,11 +16,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
+@CrossOrigin(origins = "*")
 public class WebSocketController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
@@ -59,44 +61,28 @@ public class WebSocketController {
         }
     }
 
-    @MessageMapping("/createRoom")
-    public void createRoom(String details) throws ParseException {
-        try {
-            JSONObject userDetails = (JSONObject) this.parser.parse(details);
-            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"), (String) userDetails.get("peerId"));
-            boolean result = this.jhoomUserService.createUser(newUser);
-            if (result) {
-                Room newRoom = this.roomService.createRoom();
-                this.roomService.addJhoomUserToRoom(newUser,newRoom);
-                logger.info(newUser.getUserName() + " added to Room : ",newRoom.getRoomId());
-                this.messagingTemplate.convertAndSend("/passport", newRoom.getRoomId());
-                List<String> temp = this.roomService.returnUsers(newRoom);
-                this.messagingTemplate.convertAndSend("/tempoo",temp);
-            }
-            else logger.info("User already exists");
-        }
-        catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    @PostMapping("/createRoom")
+    @CrossOrigin
+    public String createRoom(@RequestBody JhoomUser jhoomUser) {
+        this.jhoomUserService.createUser(jhoomUser);
+        String newRoomId = this.roomService.createRoom();
+        boolean isJhoomUserAdded = this.roomService.addJhoomUserToRoom(jhoomUser,newRoomId);
+        if (isJhoomUserAdded) return newRoomId;
+        else return "Error adding user to new room";
     }
 
-    @MessageMapping("/joinRoom")
-    public void joinRoom(String details) throws ParseException {
-        logger.info(details);
-        try {
-            JSONObject userDetails = (JSONObject) this.parser.parse(details);
-            JhoomUser newUser = new JhoomUser((String) userDetails.get("username"), (String) userDetails.get("peerId"));
-            boolean result = this.jhoomUserService.createUser(newUser);
-            if (result) {
-                Room newRoom = this.roomService.findRoom((String) userDetails.get("roomId"));
-                this.roomService.addJhoomUserToRoom(newUser,newRoom);
-                Room newRoom1 = this.roomService.findRoom((String) userDetails.get("roomId"));
-                this.messagingTemplate.convertAndSend("/tempoo",newRoom1);
-            }
-            else logger.info("User already exists");
-        }
-        catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    @PostMapping("/joinRoom/{roomId}")
+    @CrossOrigin
+    public String joinRoom(@RequestBody JhoomUser jhoomUser,@PathVariable("roomId") String roomId) {
+        this.jhoomUserService.createUser(jhoomUser);
+        boolean isJhoomUserAdded = this.roomService.addJhoomUserToRoom(jhoomUser,roomId);
+        if (isJhoomUserAdded) return "User Connected";
+        else return "Error adding user to room, please check room Id";
     }
+
+    @GetMapping("/getUsers/{roomId}")
+    public List<String> getUsers(@PathVariable("roomId") String roomId) {
+        return this.roomService.returnUsers(roomId);
+    }
+
 }

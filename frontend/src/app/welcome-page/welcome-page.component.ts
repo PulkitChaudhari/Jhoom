@@ -29,28 +29,23 @@ export class WelcomePageComponent implements OnInit {
     this.isJoinARoomSelected = value;
   }
 
-  joinMeeting() {
-    this.dataShareService.shareUserName(this.userName);
-    if (this.messageService.initializeWebSocketConnection(this.userName)) {
-      this.router.navigate(['chat']);
-    } else console.log('Could not connect to the server');
-  }
-
   joinRoom() {
     const peerId = this.peerService.getPeerId();
     const userObj = {
-      username: this.userName,
+      userName: this.userName,
       peerId: peerId,
-      roomId: this.roomId,
     };
-    this.messageService.joinRoom(userObj);
+    this.messageService.joinRoom(userObj, this.roomId);
     this.router.navigate(['chat']);
+    this.dataShareService.shareUserName(this.userName);
   }
 
   createRoom() {
     const peerId = this.peerService.getPeerId();
-    const userObj = { username: this.userName, peerId: peerId };
+    const userObj = { userName: this.userName, peerId: peerId };
     this.messageService.createRoom(userObj);
     this.router.navigate(['chat']);
+    this.dataShareService.shareUserName(this.userName);
+    this.dataShareService.sharePeerId(peerId);
   }
 }

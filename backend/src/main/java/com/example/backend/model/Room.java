@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,6 +23,7 @@ public class Room {
 
     public Room(String roomId) {
         this.roomId = roomId;
+        this.users = new ArrayList<>();
     }
 
     public boolean addUser(JhoomUser jhoomUser) {

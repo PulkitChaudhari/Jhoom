@@ -7,11 +7,13 @@ export class DataShareService {
   // Declaring a new behaviorSubject
   private messages$ = new BehaviorSubject<any>({});
   private userName$ = new BehaviorSubject<any>({});
-  private peer$ = new BehaviorSubject<any>({});
+  private roomId$ = new BehaviorSubject<any>({});
+  private peerId$ = new BehaviorSubject<any>({});
 
   messagesObs$ = this.messages$.asObservable();
   userNameObs$ = this.userName$.asObservable();
-  peerObs$ = this.peer$.asObservable();
+  roomIdObs$ = this.roomId$.asObservable();
+  peerIdObs$ = this.peerId$.asObservable();
 
   addMessage(message: string) {
     this.messages$.next(message);
@@ -22,6 +24,10 @@ export class DataShareService {
   }
 
   sharePeerId(peerId: string) {
-    this.peer$.next(peerId);
+    this.peerId$.next(peerId);
+  }
+
+  shareRoomId(roomId: string) {
+    this.roomId$.next(roomId);
   }
 }

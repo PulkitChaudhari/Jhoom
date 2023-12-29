@@ -9,5 +9,5 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 public interface JhoomUserService {
-    boolean createUser(JhoomUser user);
+    void createUser(JhoomUser user);
 }

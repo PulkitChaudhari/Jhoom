@@ -20,14 +20,11 @@ public class JhoomUserServiceImpl implements JhoomUserService {
     private static final Logger logger = LoggerFactory.getLogger(JhoomUserServiceImpl.class);
 
     @Override
-    public boolean createUser(JhoomUser user) {
+    public void createUser(JhoomUser user) {
         Optional<JhoomUser> isUserExists = this.userRepository.findById(user.getUserName());
-        logger.info(String.valueOf(isUserExists.isPresent()));
         if (isUserExists.isEmpty()) {
             this.userRepository.save(user);
-            return true;
         }
-        else return false;
     }
 
 }

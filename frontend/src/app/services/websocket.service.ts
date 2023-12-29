@@ -4,13 +4,17 @@ declare var Stomp: { over: (arg0: any) => any };
 import { environment } from '../environment/environment';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { DataShareService } from '../services/data.share.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
   // Initializing websocket connection in constructor
-  constructor(private dataShareService: DataShareService) {}
+  constructor(
+    private dataShareService: DataShareService,
+    private http: HttpClient
+  ) {}
 
   private stompClient: any;
 
@@ -50,10 +54,26 @@ export class MessageService {
   }
 
   createRoom(userObj: any) {
-    this.stompClient.send('/app/createRoom', {}, JSON.stringify(userObj));
+    // this.stompClient.send('/app/createRoom', {}, JSON.stringify(userObj));
+    console.log(userObj);
+    this.http
+      .post('http://localhost:8082/createRoom', JSON.stringify(userObj), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .subscribe((value) => {
+        console.log(value);
+      });
   }
 
-  joinRoom(details: any) {
+  joinRoom(details: any, roomId: string) {
     this.stompClient.send('/app/joinRoom', {}, JSON.stringify(details));
+    console.log('http://localhost:8082/joinRoom' + roomId);
+    this.http
+      .post('http://localhost:8082/joinRoom' + roomId, JSON.stringify(details))
+      .subscribe((value) => {
+        console.log(value);
+      });
   }
 }

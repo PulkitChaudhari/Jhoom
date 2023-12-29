@@ -19,7 +19,7 @@ export class VideoComponent {
   ngOnInit(): void {
     const peer = this.peerService.getPeer();
 
-    this.dataShareService.peerObs$.subscribe((value) => {});
+    this.dataShareService.peerIdObs$.subscribe((value) => {});
 
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })

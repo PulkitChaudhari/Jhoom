@@ -10,7 +10,7 @@ import { DataShareService } from '../services/data.share.service';
 export class ChatComponent implements OnInit {
   message: string;
   userName: string;
-  peerId: string;
+  roomId: string;
 
   messages: any[] = [];
 
@@ -29,8 +29,8 @@ export class ChatComponent implements OnInit {
     this.dataShareService.userNameObs$.subscribe((value) => {
       this.userName = value;
     });
-    this.dataShareService.peerObs$.subscribe((value) => {
-      this.peerId = value;
+    this.dataShareService.roomIdObs$.subscribe((value) => {
+      this.roomId = value;
     });
   }
 

@@ -20,18 +20,20 @@ public class RoomServiceImpl implements RoomService {
     RoomRepository roomRepository;
 
     @Override
-    public Room createRoom() {
+    public String createRoom() {
         String newMeetingRoomId = this.meetingRoomIdGenerator.generateMeetingRoomId();
         Room newMeetingRoom = new Room(newMeetingRoomId);
         this.roomRepository.save(newMeetingRoom);
-        return newMeetingRoom;
+        return newMeetingRoomId;
     }
 
     @Override
-    public boolean addJhoomUserToRoom(JhoomUser jhoomUser, Room room) {
-        Optional<Room> isRoomExists = this.roomRepository.findById(room.getRoomId());
+    public boolean addJhoomUserToRoom(JhoomUser jhoomUser, String roomId) {
+        Optional<Room> isRoomExists = this.roomRepository.findById(roomId);
         if (isRoomExists.isPresent()) {
             Room currRoom = isRoomExists.get();
+            List<JhoomUser> users = currRoom.getUsers();
+            if (users.contains(jhoomUser)) return false;
             currRoom.addUser(jhoomUser);
             this.roomRepository.save(currRoom);
             return true;
@@ -39,8 +41,8 @@ public class RoomServiceImpl implements RoomService {
         return false;
     }
 
-    public List<String> returnUsers(Room room) {
-        Optional<Room> isRoom = this.roomRepository.findById(room.getRoomId());
+    public List<String> returnUsers(String roomId) {
+        Optional<Room> isRoom = this.roomRepository.findById(roomId);
         if (isRoom.isPresent()) {
             Room currRoom = isRoom.get();
             List<JhoomUser> users = currRoom.getUsers();
