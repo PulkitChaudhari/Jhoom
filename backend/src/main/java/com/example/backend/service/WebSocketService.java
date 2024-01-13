@@ -1,6 +1,9 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +23,10 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void forwardMessage(String message) {
-        String msgToString = message.toString();
-        this.template.convertAndSend("/message", message);
+    public void forwardMessage(String userName,String message) {
+        JSONObject response  = new JSONObject();
+        response.put("message",message);
+        response.put("userName",userName);
+        this.template.convertAndSend("/messages", response);
     }
 }

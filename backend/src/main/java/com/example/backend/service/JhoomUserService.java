@@ -10,4 +10,6 @@ import java.util.Optional;
 
 public interface JhoomUserService {
     void createUser(JhoomUser user);
+
+    JhoomUser findUser(String userName);
 }

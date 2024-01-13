@@ -1,34 +1,33 @@
 // peer.service.ts
 import { Injectable } from '@angular/core';
 import Peer from 'peerjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { DataShareService } from './data.share.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PeerService {
+
   private peer: Peer;
-  private peerId: string;
 
-  constructor() {
-    this.peer = new Peer(); // You can pass options here if needed
+  constructor(private dataShareService : DataShareService) {
+    this.peer = new Peer();
+  }
 
+  generatePeerId() : Number {
     this.peer.on('open', (id) => {
-      this.peerId = id;
-      console.log('My peer ID is: ' + id);
+      console.log("My peerId is : " + id );
+      this.dataShareService.sharePeerId(id);
+      return 0;
     });
-
-    // this.peer.on('error', (err) => {
-    //   console.error(err);
-    // });
+    this.peer.on('error', (err) => {
+      return 1;
+    })
+    return 2;
   }
 
   getPeer(): Peer {
     return this.peer;
   }
-
-  getPeerId(): string {
-    return this.peerId;
-  }
-
-  // Implement methods to connect, send and receive data, etc.
 }

@@ -1,13 +1,24 @@
-import { Component } from '@angular/core';
-import { ChatComponent } from './chat/chat.component';
-import { WelcomePageComponent } from './welcome-page/welcome-page.component';
+import { Component, OnInit } from '@angular/core';
+import { PeerService } from './services/peerjs.service';
+import { MessageService } from './services/websocket.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+
+  constructor(private peerService : PeerService,private messageService:MessageService) {}
+
+  ngOnInit() {
+    this.messageService.initializeWebSocketConnection().then((value)=>{
+      this.peerService.generatePeerId();
+    },(value)=>{
+      console.log("Promise rejected");
+    });
+  }
+  
   title = 'Jhoom';
 
   htmlTag: HTMLElement | null;

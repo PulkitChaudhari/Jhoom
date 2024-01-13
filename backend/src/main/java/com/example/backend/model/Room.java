@@ -21,9 +21,13 @@ public class Room {
     @OneToMany(fetch = FetchType.EAGER)
     List<JhoomUser> users;
 
+    @OneToMany(fetch = FetchType.EAGER)
+    List<Message> messages;
+
     public Room(String roomId) {
         this.roomId = roomId;
         this.users = new ArrayList<>();
+        this.messages = new ArrayList<>();
     }
 
     public boolean addUser(JhoomUser jhoomUser) {

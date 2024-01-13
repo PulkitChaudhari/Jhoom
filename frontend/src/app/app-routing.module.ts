@@ -6,7 +6,8 @@ import { JhoomComponent } from './jhoom/jhoom.component';
 
 const routes: Routes = [
   { path: 'welcome', component: WelcomePageComponent },
-  { path: 'chat', component: JhoomComponent },
+  { path: 'chat/:roomId', component: JhoomComponent },
+  { path: '**', redirectTo: 'welcome'}
 ];
 
 @NgModule({

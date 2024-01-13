@@ -15,11 +15,6 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final MessageService messageService;
-
-    public WebSocketConfig(MessageService messageService) {
-        this.messageService = messageService;
-    }
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
@@ -29,15 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app")
-                .setUserDestinationPrefix("/user")
-                .enableSimpleBroker("/message", "/passport","/tempoo");
-    }
-
-    @Override
-    public void configureWebSocketTransport( WebSocketTransportRegistration registration )
-    {
-//        registration.setMessageSizeLimit( 300000 * 50 ); // default : 64 * 1024
-//        registration.setSendTimeLimit( 30 * 10000 ); // default : 10 * 10000
-//        registration.setSendBufferSizeLimit( 3 * 512 * 1024 ); // default : 512 * 1024
+                .setUserDestinationPrefix("/room")
+                .enableSimpleBroker("/messages", "/passport","/sharePeerIds");
     }
 }

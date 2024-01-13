@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { MessageService } from '../services/websocket.service';
 import { Router } from '@angular/router';
 import { DataShareService } from '../services/data.share.service';
-import { PeerService } from '../services/peerjs.service';
 
 @Component({
   selector: 'app-welcome-page',
@@ -10,19 +9,26 @@ import { PeerService } from '../services/peerjs.service';
   styleUrls: ['./welcome-page.component.css'],
 })
 export class WelcomePageComponent implements OnInit {
-  userName: any;
-  roomId: any;
-  isJoinARoomSelected: boolean = true;
+
+  public userName: string = ""
+  public roomId:string = ""
+  public isJoinARoomSelected: boolean = true;
+  public peerId: string
+  public joiningDetails = {
+    userName:"",
+    peerId:""
+  }
 
   constructor(
     private messageService: MessageService,
     private router: Router,
     private dataShareService: DataShareService,
-    private peerService: PeerService
   ) {}
 
   ngOnInit() {
-    this.messageService.initializeWebSocketConnection('hehe');
+    this.dataShareService.peerIdObs$.subscribe((peerId)=>{
+      this.peerId = peerId;
+    });
   }
 
   switchMeetingJoiningMode(value: boolean): void {
@@ -30,22 +36,27 @@ export class WelcomePageComponent implements OnInit {
   }
 
   joinRoom() {
-    const peerId = this.peerService.getPeerId();
-    const userObj = {
-      userName: this.userName,
-      peerId: peerId,
-    };
-    this.messageService.joinRoom(userObj, this.roomId);
-    this.router.navigate(['chat']);
-    this.dataShareService.shareUserName(this.userName);
+    this.messageService.joinRoom(this.joiningDetails, this.roomId).subscribe((isRoomJoined)=>{
+      if (isRoomJoined) {
+        this.messageService.getMessages(this.roomId).subscribe((messages:string)=>{
+          this.dataShareService.shareUserName(this.userName);
+          const parsedMessages : object[] = JSON.parse(messages);
+          this.dataShareService.addMessage(parsedMessages);
+          this.router.navigate(['chat',this.roomId]);
+        })
+      }
+      else console.log("Could not join room");
+    });
   }
 
   createRoom() {
-    const peerId = this.peerService.getPeerId();
-    const userObj = { userName: this.userName, peerId: peerId };
-    this.messageService.createRoom(userObj);
-    this.router.navigate(['chat']);
-    this.dataShareService.shareUserName(this.userName);
-    this.dataShareService.sharePeerId(peerId);
+    this.messageService.createRoom(this.joiningDetails).subscribe((roomId)=>{
+      if (roomId != "") {
+          this.dataShareService.shareUserName(this.userName);
+          this.dataShareService.shareRoomId(roomId);
+          this.router.navigate(['chat',roomId]);
+      }
+      else console.log("Error");
+    });
   }
 }

@@ -4,20 +4,29 @@ import com.example.backend.common.MeetingRoomIdGenerator;
 import com.example.backend.model.JhoomUser;
 import com.example.backend.model.Room;
 import com.example.backend.respository.RoomRepository;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoomServiceImpl implements RoomService {
     @Autowired
-    MeetingRoomIdGenerator meetingRoomIdGenerator;
+    private MeetingRoomIdGenerator meetingRoomIdGenerator;
 
     @Autowired
-    RoomRepository roomRepository;
+    private RoomRepository roomRepository;
+
+    private final SimpMessagingTemplate template;
+
+    public RoomServiceImpl(SimpMessagingTemplate template) {
+        this.template = template;
+    }
 
     @Override
     public String createRoom() {
@@ -36,6 +45,7 @@ public class RoomServiceImpl implements RoomService {
             if (users.contains(jhoomUser)) return false;
             currRoom.addUser(jhoomUser);
             this.roomRepository.save(currRoom);
+            this.template.convertAndSend("/sharePeerIds",jhoomUser.getPeerId());
             return true;
         }
         return false;
@@ -59,5 +69,21 @@ public class RoomServiceImpl implements RoomService {
             return isRoom.get();
         }
         return new Room();
+    }
+
+    public List<JSONObject> returnMessages(String roomId) {
+        Optional<Room> isRoomExists = this.roomRepository.findById(roomId);
+        if(isRoomExists.isPresent()) {
+            Room room = isRoomExists.get();
+            List<JSONObject> messages = new ArrayList<JSONObject>();
+            room.getMessages().forEach((msg -> {
+                JSONObject temp = new JSONObject();
+                temp.put("userName",msg.getJhoomUser().getUserName());
+                temp.put("message",msg.getMessage());
+                messages.add(temp);
+            }));
+            return messages;
+        }
+        return new ArrayList<JSONObject>();
     }
 }

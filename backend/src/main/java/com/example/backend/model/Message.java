@@ -16,14 +16,11 @@ import java.time.LocalDateTime;
 public class Message {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long messageID;
+    private String messageID;
 
     @ManyToOne
     @JoinColumn(name = "user_username", nullable = false)
     private JhoomUser jhoomUser;
-
-    private LocalDateTime time;
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)

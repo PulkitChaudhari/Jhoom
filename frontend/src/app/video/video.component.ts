@@ -17,26 +17,43 @@ export class VideoComponent {
   ) {}
 
   ngOnInit(): void {
-    const peer = this.peerService.getPeer();
+    this.dataShareService.otherPeerIdObs$.subscribe((msg:any)=>{
+      if (msg !== this.peerService.getPeer().id) {
+        const peer = this.peerService.getPeer();
+    // navigator.mediaDevices
+    // .getUserMedia({ video: true, audio: true })
+    // .then((stream) => {
+    //   this.localVideo.nativeElement.srcObject = stream;
 
-    this.dataShareService.peerIdObs$.subscribe((value) => {});
+    //   // Connect to a peer and send the stream
+    //   const call = peer.call(msg, stream);
 
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        this.localVideo.nativeElement.srcObject = stream;
+    //   // Handle incoming stream
+    //   peer.on('call', (incomingCall) => {
+    //     console.log("call received");
+    //     // incomingCall.answer(stream);
+    //     // incomingCall.on('stream', (remoteStream) => {
+    //     //   this.remoteVideo.nativeElement.srcObject = remoteStream;
+    //     // });
+    //   });
+    // })
+    // .catch((error) => console.error('getUserMedia error:', error));
 
-        // Connect to a peer and send the stream
-        const call = peer.call('remote-peer-id', stream);
+      // this.localVideo.nativeElement.srcObject = stream;
+      // Connect to a peer and send the stream
+    //   const call = peer.call(msg, "stream");
 
-        // Handle incoming stream
-        peer.on('call', (incomingCall) => {
-          incomingCall.answer(stream);
-          incomingCall.on('stream', (remoteStream) => {
-            this.remoteVideo.nativeElement.srcObject = remoteStream;
-          });
-        });
-      })
-      .catch((error) => console.error('getUserMedia error:', error));
+    //   // Handle incoming stream
+    //   peer.on('call', (incomingCall) => {
+    //     console.log("call received");
+    //     // incomingCall.answer(stream);
+    //     // incomingCall.on('stream', (remoteStream) => {
+    //     //   this.remoteVideo.nativeElement.srcObject = remoteStream;
+    //     // });
+    //   });
+    // })
+    // .catch((error) => console.error('getUserMedia error:', error));
+      }
+    })
   }
 }

@@ -1,19 +1,19 @@
 package com.example.backend.service;
 
 import com.example.backend.model.Message;
+import com.example.backend.model.Room;
+import com.example.backend.respository.MessageRepository;
+import com.example.backend.respository.RoomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 
-@Service
-public class MessageService {
-        private final Vector<Message> messageVector = new Vector<Message>();
+public interface MessageService {
 
-        public void addMessage(Message message) {
-            messageVector.add(message);
-        }
+    boolean saveMessage(Message message);
 
-        public Vector<Message> getMessageVector() {
-            return messageVector;
-        }
+    void saveIncomingMessageAndForward(String roomId,String userName,String message);
 }
