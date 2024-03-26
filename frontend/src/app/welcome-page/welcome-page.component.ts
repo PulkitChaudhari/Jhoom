@@ -26,7 +26,7 @@ export class WelcomePageComponent implements OnInit {
 
   ngOnInit() {
     this.dataShareService.peerIdObs$.subscribe((peerId) => {
-      this.peerId = peerId;
+      this.joiningDetails.peerId = peerId;
     });
   }
 
@@ -39,6 +39,7 @@ export class WelcomePageComponent implements OnInit {
       .joinRoom(this.joiningDetails, this.roomId)
       .subscribe((isRoomJoined) => {
         if (isRoomJoined) {
+          this.messageService.getPeerIds();
           this.messageService
             .getMessages(this.roomId)
             .subscribe((messages: string) => {
@@ -54,6 +55,7 @@ export class WelcomePageComponent implements OnInit {
   createRoom() {
     this.messageService.createRoom(this.joiningDetails).subscribe((roomId) => {
       if (roomId != '') {
+        this.messageService.getPeerIds();
         this.dataShareService.shareUserName(this.joiningDetails.userName);
         this.dataShareService.shareRoomId(roomId);
         this.router.navigate(['chat', roomId]);

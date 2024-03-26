@@ -33,8 +33,8 @@ export class MessageService {
   }
 
   getPeerIds() {
-    this.stompClient.subscribe('/sharePeerIds', (peerId: string) => {
-      console.log(JSON.parse(peerId));
+    this.stompClient.subscribe('/sharePeerIds', (peerId: any) => {
+      this.dataShareService.shareOtherPeerId(peerId.body);
     });
   }
 

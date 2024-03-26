@@ -19,7 +19,7 @@ export class DataShareService {
   peerIdObs$ = this.peerId$.asObservable();
   otherPeerIdObs$ = this.otherPeerId$.asObservable();
 
-  addMessage(messageDetails:any) {
+  addMessage(messageDetails: any) {
     this.prevMessages$.next(messageDetails);
   }
 
@@ -35,11 +35,12 @@ export class DataShareService {
     this.roomId$.next(roomId);
   }
 
-  shareMessage(message:string) {
+  shareMessage(message: string) {
     this.wsMessages$.next(message);
   }
 
-  shareOtherPeerId(peerId:string) {
+  shareOtherPeerId(peerId: string) {
+    console.log(peerId);
     this.otherPeerId$.next(peerId);
   }
 }
