@@ -19,54 +19,63 @@ export class MessageService {
 
   meetingRoomId: string;
 
-  initializeWebSocketConnection() : Promise<any> {
-    return new Promise((resolve,reject)=>{
+  initializeWebSocketConnection(): Promise<any> {
+    return new Promise((resolve, reject) => {
       const serverUrl = environment.app_url;
       const ws = new SockJS(serverUrl);
       this.stompClient = Stomp.over(ws);
-      this.stompClient.connect({}, () => resolve(true),()=>reject(false));
-    })
+      this.stompClient.connect(
+        {},
+        () => resolve(true),
+        () => reject(false)
+      );
+    });
   }
 
   getPeerIds() {
-    this.stompClient.subscribe('/sharePeerIds',(peerId:string)=>{
+    this.stompClient.subscribe('/sharePeerIds', (peerId: string) => {
       console.log(JSON.parse(peerId));
     });
   }
 
   sendMessage(userObj: any) {
-    this.stompClient.send('/app/send/message', {}, JSON.stringify(userObj)).subscribe((msg:any)=>{
-        console.log(JSON.parse(msg));
-    })
+    this.stompClient.send('/app/send/message', {}, JSON.stringify(userObj));
   }
 
   fetchWSMessages() {
-    this.stompClient.subscribe('/messages',(msg:any)=>{
+    this.stompClient.subscribe('/messages', (msg: any) => {
       this.dataShareService.shareMessage(msg);
     });
   }
 
-  createRoom(userObj: any) : Observable<any> {
-    return this.http
-      .post('http://localhost:8082/createRoom', JSON.stringify(userObj), {
+  createRoom(userObj: any): Observable<any> {
+    return this.http.post(
+      'http://localhost:8082/createRoom',
+      JSON.stringify(userObj),
+      {
         headers: {
           'Content-Type': 'application/json',
         },
-        responseType: 'text'
-      });
+        responseType: 'text',
+      }
+    );
   }
 
-  joinRoom(details: any, roomId: string) : Observable<any>  {
-    return this.http
-      .post('http://localhost:8082/joinRoom/' + roomId, JSON.stringify(details), {
+  joinRoom(details: any, roomId: string): Observable<any> {
+    return this.http.post(
+      'http://localhost:8082/joinRoom/' + roomId,
+      JSON.stringify(details),
+      {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      }
+    );
   }
 
-  getMessages(roomId:string):Observable<any>{
-    return this.http.get('http://localhost:8082/getMessages/'+roomId,
-    {responseType: 'text'});
+  getMessages(roomId: string): Observable<any> {
+    return this.http.get('http://localhost:8082/getMessages/' + roomId, {
+      responseType: 'text',
+    });
   }
 }

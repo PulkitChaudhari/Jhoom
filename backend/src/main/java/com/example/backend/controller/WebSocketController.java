@@ -2,7 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.common.HashGenerator;
 import com.example.backend.model.JhoomUser;
-import com.example.backend.model.MessageRequestDTO;
+import com.example.backend.model.Message;
+import com.example.backend.model.Room;
 import com.example.backend.service.*;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -45,11 +46,12 @@ public class WebSocketController {
     }
 
     @MessageMapping("/send/message")
-    public String incomingMessage(@Payload MessageRequestDTO requestMessage) {
-        if (requestMessage.getUserName() != null) {
-            this.messageServiceImpl.saveIncomingMessageAndForward(requestMessage.getRoomId(),requestMessage.getUserName(),requestMessage.getMessage());
+    public void incomingMessage(@Payload JSONObject requestMessage) {
+        if (requestMessage.containsKey("userName")) {
+            JhoomUser userFound = jhoomUserServiceImpl.findUser(requestMessage.get("userName").toString());
+            Room roomFound = roomServiceImpl.findRoom(requestMessage.get("roomId").toString());
+            this.messageServiceImpl.saveIncomingMessageAndForward(requestMessage.get("roomId").toString(),requestMessage.get("userName").toString(),requestMessage.get("message").toString());
         }
-        return "HEHEHEHEHE";
     }
 
     @PostMapping("/createRoom")
