@@ -1,80 +1,68 @@
 package com.example.backend.controller;
 
 import com.example.backend.common.HashGenerator;
-import com.example.backend.model.JhoomUser;
-import com.example.backend.model.Message;
-import com.example.backend.model.Room;
+import com.example.backend.common.MeetingRoomIdGenerator;
 import com.example.backend.service.*;
+import org.apache.catalina.connector.Response;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.net.http.HttpResponse;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class WebSocketController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
 
-    @Autowired
-    private JhoomUserServiceImpl jhoomUserServiceImpl;
 
     @Autowired
     private WebSocketService webSocketService;
 
-    @Autowired
-    private RoomServiceImpl roomServiceImpl;
 
     @Autowired
     private HashGenerator hashGenerator;
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    private  MessageServiceImpl messageServiceImpl;
 
     @Autowired
-    public WebSocketController(MessageServiceImpl messageServiceImpl, SimpMessagingTemplate messagingTemplate) {
-        this.messageServiceImpl = messageServiceImpl;
+    private MeetingRoomIdGenerator meetingRoomIdGenerator;
+
+    @Autowired
+    public WebSocketController(SimpMessagingTemplate messagingTemplate
+    , MeetingRoomIdGenerator meetingRoomIdGenerator) {
+        this.meetingRoomIdGenerator = meetingRoomIdGenerator;
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/send/message")
-    public void incomingMessage(@Payload JSONObject requestMessage) {
-        if (requestMessage.containsKey("userName")) {
-            JhoomUser userFound = jhoomUserServiceImpl.findUser(requestMessage.get("userName").toString());
-            Room roomFound = roomServiceImpl.findRoom(requestMessage.get("roomId").toString());
-            this.messageServiceImpl.saveIncomingMessageAndForward(requestMessage.get("roomId").toString(),requestMessage.get("userName").toString(),requestMessage.get("message").toString());
-        }
+    @MessageMapping("/room/notif")
+    public void incomingRoomNotif(@Payload JSONObject roomNotif) {
+        this.webSocketService.sendRoomNotif((String) roomNotif.get("roomId"),roomNotif);
     }
 
-    @PostMapping("/createRoom")
-    public String createRoom(@RequestBody JhoomUser jhoomUser) {
-        this.jhoomUserServiceImpl.createUser(jhoomUser);
-        String newRoomId = this.roomServiceImpl.createRoom();
-        this.roomServiceImpl.addJhoomUserToRoom(jhoomUser,newRoomId);
-        return newRoomId;
+    @MessageMapping("/offer")
+    public void incomingOffer(@Payload JSONObject requestOffer) {
+
+    }
+
+    @GetMapping("/createRoom")
+    public ResponseEntity<String> createRoom() {
+        String newMeetingRoomId = MeetingRoomIdGenerator.generateMeetingRoomId();
+        return new ResponseEntity<String>(newMeetingRoomId, HttpStatus.OK);
     }
 
     @PostMapping("/joinRoom/{roomId}")
-    public Boolean joinRoom(@RequestBody JhoomUser jhoomUser,@PathVariable("roomId") String roomId) {
-        this.jhoomUserServiceImpl.createUser(jhoomUser);
-        return this.roomServiceImpl.addJhoomUserToRoom(jhoomUser,roomId);
-    }
-
-    @GetMapping("/getUsers/{roomId}")
-    public List<String> getUsers(@PathVariable("roomId") String roomId) {
-        return this.roomServiceImpl.returnUsers(roomId);
-    }
-
-    @GetMapping("/getMessages/{roomId}")
-    public List<JSONObject> returnMessages(@PathVariable("roomId") String roomId) {
-        return this.roomServiceImpl.returnMessages(roomId);
+    public Boolean joinRoom() {
+        return true;
     }
 }

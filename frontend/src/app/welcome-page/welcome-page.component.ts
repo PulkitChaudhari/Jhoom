@@ -35,31 +35,22 @@ export class WelcomePageComponent implements OnInit {
   }
 
   joinRoom() {
-    this.messageService
-      .joinRoom(this.joiningDetails, this.roomId)
-      .subscribe((isRoomJoined) => {
-        if (isRoomJoined) {
-          this.messageService.getPeerIds();
-          this.messageService
-            .getMessages(this.roomId)
-            .subscribe((messages: string) => {
-              this.dataShareService.shareUserName(this.joiningDetails.userName);
-              const parsedMessages: object[] = JSON.parse(messages);
-              this.dataShareService.addMessage(parsedMessages);
-              this.router.navigate(['chat', this.roomId]);
-            });
-        } else console.log('Could not join room');
-      });
+    // this.messageService.joinRoom().subscribe((roomId) => {
+    //   if (roomId) {
+    //     this.dataShareService.shareRoomId(roomId, 'created');
+    //     this.router.navigate(['room', roomId]);
+    //   }
+    // });
+    this.dataShareService.shareRoomId(this.roomId, 'joined');
+    this.router.navigate(['room', this.roomId]);
   }
 
   createRoom() {
-    this.messageService.createRoom(this.joiningDetails).subscribe((roomId) => {
-      if (roomId != '') {
-        this.messageService.getPeerIds();
-        this.dataShareService.shareUserName(this.joiningDetails.userName);
-        this.dataShareService.shareRoomId(roomId);
-        this.router.navigate(['chat', roomId]);
-      } else console.log('Error');
+    this.messageService.createRoom().subscribe((roomId) => {
+      if (roomId) {
+        this.dataShareService.shareRoomId(roomId, 'created');
+        this.router.navigate(['room', roomId]);
+      }
     });
   }
 }

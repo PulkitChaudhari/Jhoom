@@ -9,18 +9,5 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
   styleUrls: ['./jhoom.component.css'],
 })
 export class JhoomComponent {
-
-  roomId: string;
-  userName: string;
-  peerId: string;
-
-  constructor(
-    private dataShareService: DataShareService,
-  ) {}
-
-  ngOnInit(): void {
-    this.dataShareService.roomIdObs$.subscribe((value) => this.roomId = value);
-    this.dataShareService.peerIdObs$.subscribe((value) => this.peerId = value);
-    this.dataShareService.userNameObs$.subscribe((value) => this.userName = value);
-  }
+  constructor(private dataShareService: DataShareService) {}
 }
