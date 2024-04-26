@@ -8,12 +8,13 @@ import { MessageService } from '../services/websocket.service';
   styleUrls: ['./video.component.css'],
 })
 export class VideoComponent {
-  private localVideo: MediaStreamTrack;
   private roomId: string = '';
   private roomJoiningStatus: 'joined' | 'created';
 
   @ViewChild('localVideoTrack') localVideoTrack: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideoTrack') remoteVideoTrack: ElementRef<HTMLVideoElement>;
+
+  private remoteStream: MediaStream = new MediaStream();
 
   constructor(
     private dataShareService: DataShareService,
@@ -39,7 +40,7 @@ export class VideoComponent {
     });
     // MediaStream
     this.localVideoTrack.nativeElement.srcObject = stream;
-    this.localVideo = stream.getVideoTracks()[0];
+    this.rtcPeerConnection = new RTCPeerConnection(this.configuration);
 
     this.dataShareService.roomIdObs$.subscribe((obj) => {
       this.roomJoiningStatus = obj.type;
@@ -54,15 +55,17 @@ export class VideoComponent {
 
             // When a user joins
             if (update.type == 'joined') {
-              //Creating a new RtcPeerConnectingObject
-              this.rtcPeerConnection = new RTCPeerConnection(
-                this.configuration
-              );
+              stream.getTracks().forEach((track) => {
+                this.rtcPeerConnection.addTrack(track, stream);
+              });
 
-              // this.rtcPeerConnection.addTransceiver(this.localVideo);
+              this.rtcPeerConnection.ontrack = (event) => {
+                console.log(event);
+                event.streams[0].getTracks().forEach((track) => {
+                  this.remoteStream.addTrack(track);
+                });
+              };
 
-              // this.rtcPeerConnection = new RTCPeerConnection();
-              // this.configuration
               this.rtcPeerConnection.createDataChannel('myDataChannel', {
                 ordered: true,
                 maxRetransmits: 100,
@@ -129,17 +132,9 @@ export class VideoComponent {
                 (event: any) => {
                   if (this.rtcPeerConnection.connectionState === 'connected') {
                     console.log('Connected ', event);
-                    stream.getTracks().forEach((track) => {
-                      this.rtcPeerConnection.addTrack(track, stream);
-                    });
-                    const remoteTracks: any = [];
-                    this.rtcPeerConnection.getSenders().forEach((receiver) => {
-                      remoteTracks.push(receiver.track);
-                    });
-                    console.log(remoteTracks, 'user1');
                     // Do something with the remote tracks, like adding them to a <video> element
                     this.remoteVideoTrack.nativeElement.srcObject =
-                      new MediaStream(remoteTracks);
+                      this.remoteStream;
                   }
                 }
               );
@@ -158,15 +153,17 @@ export class VideoComponent {
 
             // if update is of offer being sent
             if (update.type == 'send-offer') {
-              // Creating rtcpeerconnection object and setting the offer as
-              // remote description
-              this.rtcPeerConnection = new RTCPeerConnection(
-                this.configuration
-              );
+              stream.getTracks().forEach((track) => {
+                this.rtcPeerConnection.addTrack(track, stream);
+              });
 
-              // this.rtcPeerConnection.addTransceiver(this.localVideo);
+              this.rtcPeerConnection.ontrack = (event) => {
+                console.log(event);
+                event.streams[0].getTracks().forEach((track) => {
+                  this.remoteStream.addTrack(track);
+                });
+              };
 
-              // this.rtcPeerConnection = new RTCPeerConnection();
               await this.rtcPeerConnection.setRemoteDescription(
                 new RTCSessionDescription(update.offer)
               );
@@ -220,19 +217,9 @@ export class VideoComponent {
                 (event: any) => {
                   if (this.rtcPeerConnection.connectionState === 'connected') {
                     console.log('Connected ', event);
-                    stream.getTracks().forEach((track) => {
-                      this.rtcPeerConnection.addTrack(track, stream);
-                    });
-                    const remoteTracks: any = [];
-                    this.rtcPeerConnection
-                      .getReceivers()
-                      .forEach((receiver) => {
-                        remoteTracks.push(receiver.track);
-                      });
-                    console.log(remoteTracks, 'user2');
                     // Do something with the remote tracks, like adding them to a <video> element
                     this.remoteVideoTrack.nativeElement.srcObject =
-                      new MediaStream(remoteTracks);
+                      this.remoteStream;
                   }
                 }
               );
