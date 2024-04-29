@@ -1,24 +1,23 @@
-<div class="justify-center mt-12 h-5/6 w-full flex-col">
-  <div class="justify-center w-full h-5/6 flex">
+<div class="justify-center mt-12 h-5/6 w-full flex-col flex">
+  <div class="justify-center w-full h-5/6 flex flex-col px-8">
     <div
-      class="bg-cyan-600 w-5/6 h-full rounded-lg shadow-lg overflow-auto relative top-0 left-0 right-0"
+      class="bg-cyan-600 w-full h-full rounded-lg shadow-lg overflow-auto relative top-0 left-0 right-0 justify-center"
     >
       <div
         class="bg-slate-600 flex justify-center mb-4 p-2 rounded-t-lg sticky top-0"
       >
-        <p>Chat window {{roomId}}</p>
+        <p>Chat window {{ roomId }}</p>
       </div>
       <div>
         <ng-template ngFor let-msg [ngForOf]="messages">
           <div
             class="w-full flex"
             [ngClass]="{
-              'justify-end pr-4 max-w-1/2': msg.userName == userName,
-              ' justify-start pl-4 max-w-1/2': msg.userName != userName
+              'justify-end pr-4 max-w-1/2': msg.userName == 'self',
+              ' justify-start pl-4 max-w-1/2': msg.userName == 'other'
             }"
           >
             <div>
-              <p>{{ msg.userName }}</p>
               <div class="bg-red-500 mb-4 px-4 py-2">
                 <p>{{ msg.message }}</p>
               </div>
@@ -27,17 +26,17 @@
         </ng-template>
       </div>
     </div>
+    <input
+      class="form-control"
+      type="text"
+      placeholder="message"
+      [(ngModel)]="input"
+    />
   </div>
-  <input
-    class="form-control"
-    type="text"
-    placeholder="message"
-    [(ngModel)]="input"
-  />
-  <button class="btn btn-success" (click)="sendMessage()">Send</button>
-
-  <div class="flex justify-center mt-5">
+  <div></div>
+  <div class="flex justify-center mt-2">
     <button
+      (click)="sendMessage()"
       class="rounded-full w-fit px-4 py-1 ml-5 bg-cyan-600 text-white hover:shadow-lg shadow-md"
     >
       Send

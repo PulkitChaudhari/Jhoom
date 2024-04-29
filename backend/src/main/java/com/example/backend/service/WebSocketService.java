@@ -35,7 +35,6 @@ public class WebSocketService {
     }
 
     public void sendRoomNotif(String roomId,JSONObject roomNotif) {
-        roomNotif.put("hehe","hehe");
         String toSendUrl = "/room/update/" + roomId;
         this.template.convertAndSend(toSendUrl,roomNotif);
     }
