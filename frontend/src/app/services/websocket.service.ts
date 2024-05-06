@@ -39,7 +39,7 @@ export class MessageService {
   }
 
   sendMessage(userObj: any) {
-    this.stompClient.send('/app/send/message', {}, JSON.stringify(userObj));
+    this.stompClient.send('/app/room/notif', {}, JSON.stringify(userObj));
   }
 
   fetchWSMessages() {
@@ -48,17 +48,18 @@ export class MessageService {
     });
   }
 
-  createRoom(userObj: any): Observable<any> {
-    return this.http.post(
-      'http://localhost:8082/createRoom',
-      JSON.stringify(userObj),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        responseType: 'text',
-      }
-    );
+  getRoomUpdates(): any {
+    return this.stompClient;
+  }
+
+  getStompClient(): any {
+    return this.stompClient;
+  }
+
+  createRoom(): Observable<any> {
+    return this.http.get('http://localhost:8082/createRoom', {
+      responseType: 'text',
+    });
   }
 
   joinRoom(details: any, roomId: string): Observable<any> {

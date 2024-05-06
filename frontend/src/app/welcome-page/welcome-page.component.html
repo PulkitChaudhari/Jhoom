@@ -1,68 +1,25 @@
 <div class="dark:bg-slate-200 w-screen h-screen align-middle flex">
   <div class="flex items-center justify-center h-full w-full flex-col">
-    <div>
-      <label
-        for="themeSwitcherThree"
-        class="themeSwitcherThree relative inline-flex cursor-pointer select-none items-center"
-      >
-        <input
-          type="checkbox"
-          name="themeSwitcherThree"
-          id="themeSwitcherThree"
-          class="sr-only"
-        />
-        <div
-          class="shadow-two flex items-center justify-center rounded-md bg-white dark:bg-dark-2 px-3 py-2"
-        >
-          <span
-            [ngClass]="{
-              'selected-span': isJoinARoomSelected == true,
-              'unselected-span': isJoinARoomSelected == false
-            }"
-            (click)="switchMeetingJoiningMode(true)"
-          >
-            Join a Room
-          </span>
-          <span
-            [ngClass]="{
-              'unselected-span': isJoinARoomSelected == true,
-              'selected-span': isJoinARoomSelected == false
-            }"
-            (click)="switchMeetingJoiningMode(false)"
-          >
-            Create a room
-          </span>
-        </div>
-      </label>
-    </div>
-    <div class="flex flex-col gap-3" *ngIf="isJoinARoomSelected">
+    <div class="flex flex-col gap-3">
       <input
         class="form-control"
         type="text"
         placeholder="Room ID"
         [(ngModel)]="roomId"
       />
-      <input
-        class="form-control"
-        type="text"
-        placeholder="Username"
-        [(ngModel)]="joiningDetails.userName"
-      />
-      <a [routerLink]="['/chat',roomId]">
-      <button class="btn btn-success w-full" (click)="joinRoom()">Join</button>
-    </a>
-    </div>
-    <div class="flex flex-col gap-3" *ngIf="!isJoinARoomSelected">
-      <input
-        class="form-control"
-        type="text"
-        placeholder="Username"
-        [(ngModel)]="joiningDetails.userName"
-      />
-      
-      <a [routerLink]="['/chat',roomId]">
-      <button class="btn btn-success w-full" (click)="createRoom()">Join</button>
+      <a>
+        <button class="btn btn-success w-full" (click)="joinRoom()">
+          Join
+        </button>
       </a>
+      <span class="mt-2 text-center">OR</span>
+      <div class="flex flex-col gap-3 mt-1">
+        <a>
+          <button class="btn btn-success w-full" (click)="createRoom()">
+            Create a room
+          </button>
+        </a>
+      </div>
     </div>
   </div>
 </div>

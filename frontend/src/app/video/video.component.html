@@ -1,15 +1,12 @@
-<div class="justify-center mt-9 h-5/6 w-full flex">
+<div class="justify-center mt-4 h-5/6 w-full flex">
   <div class="relative w-5/6 h-full">
-    <div
-      class="mt-5 absolute bg-cyan-600 w-11/12 h-5/6 rounded-lg hover:shadow-lg"
-    >
-      <video #localVideo autoplay class="w-1/2 h-1/2"></video>
-      <video #remoteVideo autoplay class="w-1/2 h-1/2"></video>
+    <div class="mt-5 absolute w-full h-5/6 rounded-lg hover:shadow-lg">
+      <video #remoteVideoTrack autoplay class="w-full h-full"></video>
     </div>
     <div
-      class="absolute bottom-8 right-0 bg-cyan-200 w-1/6 h-1/6 rounded-lg hover:shadow-lg"
+      class="absolute bottom-10 right-0 w-1/6 h-1/6 rounded-lg hover:shadow-lg"
     >
-      <video #localVideo autoplay></video>
+      <video #localVideoTrack autoplay></video>
     </div>
   </div>
 </div>

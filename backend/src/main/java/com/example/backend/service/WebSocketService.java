@@ -1,8 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.model.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +21,14 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void forwardMessage(String userName,String message) {
+    public void sendOffer(String userName,String offer) {
         JSONObject response  = new JSONObject();
-        response.put("message",message);
-        response.put("userName",userName);
-        this.template.convertAndSend("/messages", response);
+        response.put("offer",offer);
+        this.template.convertAndSend("/offer/"+userName, response);
+    }
+
+    public void sendRoomNotif(String roomId,JSONObject roomNotif) {
+        String toSendUrl = "/room/update/" + roomId;
+        this.template.convertAndSend(toSendUrl,roomNotif);
     }
 }
