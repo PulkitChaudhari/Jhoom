@@ -20,6 +20,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app")
                 .setUserDestinationPrefix("/room")
-                .enableSimpleBroker("/messages", "/passport","/sharePeerIds","/room/update");
+                .enableSimpleBroker("/messages", "/room/update");
     }
 }

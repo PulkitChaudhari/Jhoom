@@ -21,19 +21,10 @@ import java.net.http.HttpResponse;
 @RestController
 @CrossOrigin
 public class WebSocketController {
-
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
-
-
     @Autowired
     private WebSocketService webSocketService;
 
-
-    @Autowired
-    private HashGenerator hashGenerator;
-
     private final SimpMessagingTemplate messagingTemplate;
-
 
     @Autowired
     private MeetingRoomIdGenerator meetingRoomIdGenerator;

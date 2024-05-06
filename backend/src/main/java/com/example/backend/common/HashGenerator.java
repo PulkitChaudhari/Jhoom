@@ -16,7 +16,6 @@ public class HashGenerator {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 
-            // Convert bytes to hexadecimal representation
             StringBuilder hashStringBuilder = new StringBuilder();
             for (byte hashByte : hashBytes) {
                 hashStringBuilder.append(String.format("%02x", hashByte));
@@ -24,7 +23,6 @@ public class HashGenerator {
 
             return hashStringBuilder.toString();
         } catch (NoSuchAlgorithmException e) {
-            // Handle exception (e.g., log or throw a runtime exception)
             e.printStackTrace();
             return null;
         }

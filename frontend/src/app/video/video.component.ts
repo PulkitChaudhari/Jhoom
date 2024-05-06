@@ -11,6 +11,7 @@ export class VideoComponent {
   private roomId: string = '';
   private roomJoiningStatus: 'joined' | 'created';
   private dataChannel: RTCDataChannel;
+  remotePeerJoined: boolean = false;
 
   @ViewChild('localVideoTrack') localVideoTrack: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideoTrack') remoteVideoTrack: ElementRef<HTMLVideoElement>;
@@ -142,6 +143,7 @@ export class VideoComponent {
 
   setRemoteVideoTrack(): void {
     this.remoteVideoTrack.nativeElement.srcObject = this.remoteStream;
+    // console.log(this.remotePeerJoined);
   }
 
   messageHandler(message: string): void {
@@ -199,15 +201,12 @@ export class VideoComponent {
         'connectionstatechange',
         (event: any) => {
           if (this.rtcPeerConnection.connectionState === 'connected') {
+            this.remotePeerJoined = true;
             this.setRemoteVideoTrack();
 
             this.dataChannel.addEventListener('open', (event) => {
               this.dataChannel.addEventListener('message', (event) => {
                 this.messageHandler(event.data);
-              });
-              this.sendMessageToPeer({
-                userName: 'pulkit',
-                message: 'hello user2',
               });
             });
           }
@@ -245,6 +244,7 @@ export class VideoComponent {
           'connectionstatechange',
           (event: any) => {
             if (this.rtcPeerConnection.connectionState === 'connected') {
+              this.remotePeerJoined = true;
               this.setRemoteVideoTrack();
 
               this.rtcPeerConnection.addEventListener(
@@ -259,10 +259,6 @@ export class VideoComponent {
                   this.dataChannel.addEventListener('open', (event: any) => {
                     this.dataChannel.addEventListener('message', (event) => {
                       this.messageHandler(event.data);
-                    });
-                    this.sendMessageToPeer({
-                      userName: 'pulkit',
-                      message: 'hello user1',
                     });
                   });
                 }

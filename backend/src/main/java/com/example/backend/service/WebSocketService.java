@@ -21,13 +21,6 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void forwardMessage(String userName,String message) {
-        JSONObject response  = new JSONObject();
-        response.put("message",message);
-        response.put("userName",userName);
-        this.template.convertAndSend("/messages", response);
-    }
-
     public void sendOffer(String userName,String offer) {
         JSONObject response  = new JSONObject();
         response.put("offer",offer);

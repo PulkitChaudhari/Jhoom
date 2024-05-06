@@ -1,20 +1,15 @@
 <div class="flex">
   <div class="fixed top-0 dark:bg-slate-800 w-screen h-14 grid grid-cols-3">
     <div class="items-center justify-start flex">
-      <button class="rounded-full w-fit px-4 py-1 ml-5 bg-cyan-600 text-white">
-        Join new room
+      <button
+        class="rounded-full w-fit px-4 py-1 ml-5 bg-cyan-600 text-white"
+        (click)="navigateToWelcomePage()"
+      >
+        <span class="back-icon">&#8592;</span> Back
       </button>
     </div>
     <div class="items-center justify-center flex">
       <p class="italic text-black dark:text-white">JHOOM</p>
-    </div>
-    <div class="items-center justify-end flex">
-      <button
-        class="rounded-full w-fit px-4 py-1 mr-5 bg-cyan-600 text-white"
-        (click)="switchTheme()"
-      >
-        Toggle theme
-      </button>
     </div>
   </div>
   <router-outlet></router-outlet>
