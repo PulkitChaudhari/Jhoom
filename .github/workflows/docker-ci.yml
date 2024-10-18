@@ -1,23 +1,40 @@
-name: Docker Image CI
+  name: Push the Docker image to AWS ECR Repo
+  on:
+    push:
+      branches:
+        - main
+  jobs:
+    Build:
+      name: Build
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
 
-on:
-  push:
-    branches: [ "main" ]
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ap-south-1
 
-jobs:
+        - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
 
-  build:
+        - name: Get commit hash
+          id: get-commit-hash
+          run: echo "::set-output name=commit-hash::$(git rev-parse --short HEAD)"
+        - name: Get timestamp
+          id: get-timestamp
+          run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Login to Docker
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - name: Build docker image
-      run: docker build -t helm-jhoom-backend
-    - name: Push to DockerHub
-      run: docker push 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/helm-jhoom/helm-jhoom-backend:latest
+        - name: Build, tag, and push the image to Amazon ECR
+          id: build-image
+          env:
+            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+            IMAGE_TAG: ${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
+          run: |
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
