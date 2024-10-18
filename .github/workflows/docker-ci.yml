@@ -20,7 +20,7 @@
         - name: Build Spring Boot project
           run: |
             cd backend
-            ./gradle/wrapper build
+            ./gradlew build
 
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
