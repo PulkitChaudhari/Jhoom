@@ -20,4 +20,4 @@ jobs:
     - name: Build docker image
       run: docker build -t helm-jhoom-backend
     - name: Push to DockerHub
-      run: docker push glokelov/helm-jhoom-backend:latest
+      run: docker push 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/helm-jhoom/helm-jhoom-backend:latest
