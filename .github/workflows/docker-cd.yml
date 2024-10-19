@@ -24,7 +24,7 @@
           uses: aws-actions/amazon-ecr-login@v1
 
         - name: Pull latest image 
-          run: sudo docker pull glokelov/helm-jhoom:latest
+          run: sudo docker pull 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/helm-jhoom:latest
 
         - name: Remove older image 
           run: sudo docker rm -f helm-jhoom-backend-container || true
