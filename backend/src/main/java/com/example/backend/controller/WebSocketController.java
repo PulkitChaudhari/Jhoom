@@ -56,4 +56,10 @@ public class WebSocketController {
     public Boolean joinRoom() {
         return true;
     }
+
+    @GetMapping("/getMessage")
+    public ResponseEntity<String> getMessage() {
+        String newMeetingRoomId = "Hello World";
+        return new ResponseEntity<String>(newMeetingRoomId, HttpStatus.OK);
+    }
 }
