@@ -59,7 +59,7 @@ public class WebSocketController {
 
     @GetMapping("/getMessage")
     public ResponseEntity<String> getMessage() {
-        String newMeetingRoomId = "Hello World";
+        String newMeetingRoomId = "Hello World1";
         return new ResponseEntity<String>(newMeetingRoomId, HttpStatus.OK);
     }
 }
