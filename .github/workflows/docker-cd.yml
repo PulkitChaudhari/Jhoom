@@ -1,9 +1,12 @@
   name: Deploy Docker image to AWS ECS
   on:
-    workflow_run:
-      workflows: ["Push the Docker image to AWS ECR Repo."]
-      types: 
-        - completed
+    workflow_dispatch:
+      inputs: 
+        debug_enabled:
+          description: 'Run the workflow with debug logging'
+          required: false
+          type: boolean
+          default: false
   jobs:
     build:
       name: Build
