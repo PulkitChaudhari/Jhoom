@@ -1,8 +1,12 @@
   name: Push the Docker image to AWS ECR Repo.
   on:
-    push:
-      branches:
-        - main
+    workflow_dispatch:
+      inputs: 
+        debug_enabled:
+          description: 'Run the workflow with debug logging'
+          required: false
+          type: boolean
+          default: false
   jobs:
     Build:
       name: Build
