@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { DataShareService } from '../services/data.share.service';
 import { MessageService } from '../services/websocket.service';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-video',
@@ -11,12 +12,14 @@ export class VideoComponent {
   private roomId: string = '';
   private roomJoiningStatus: 'joined' | 'created';
   private dataChannel: RTCDataChannel;
-  remotePeerJoined: boolean = false;
+  private localOffer: any;
+  private localAnswer: any;
+  private isFirstIce: boolean = false;
+  private rtcPeerConnection!: RTCPeerConnection;
+  private remoteStream: MediaStream = new MediaStream();
 
   @ViewChild('localVideoTrack') localVideoTrack: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideoTrack') remoteVideoTrack: ElementRef<HTMLVideoElement>;
-
-  private remoteStream: MediaStream = new MediaStream();
 
   constructor(
     private dataShareService: DataShareService,
@@ -26,28 +29,36 @@ export class VideoComponent {
   private configuration = {
     iceServers: [
       {
-        urls: 'turn:127.0.0.1',
+        urls: 'turn:43.204.217.171:3478',
         username: 'pulkit',
         credential: 'pulkit',
       },
     ],
   };
 
-  private rtcPeerConnection: RTCPeerConnection;
-
   async ngOnInit(): Promise<void> {
+    // Getting MediaStream of video and audio for local user
     const stream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
     });
 
+    // Assigning local user video and audio to html
     this.localVideoTrack.nativeElement.srcObject = stream;
+
+    // creating new rtcpeerconnection obj
     this.rtcPeerConnection = new RTCPeerConnection(this.configuration);
 
+    // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
     stream.getTracks().forEach((track) => {
       this.rtcPeerConnection.addTrack(track, stream);
     });
 
+    this.rtcPeerConnection.ontrack = (event) => {
+      console.log(event);
+    };
+
+    // Waiting to get updates whether localuser has joined a room or created one
     this.dataShareService.roomIdObs$.subscribe((obj) => {
       this.roomJoiningStatus = obj.type;
       this.roomId = obj.roomId;
@@ -65,8 +76,19 @@ export class VideoComponent {
             }
 
             // if the peer accepts offer and sends answer
-            else if (update.type == 'accept-offer') {
+            if (update.type == 'accept-offer') {
               this.userAcceptedUpdate(update.offer);
+            }
+
+            // if update is of sharing ice candidate and is not from the same user
+            // add the ice candidate
+            if (
+              update.type == 'sharing-ice-candidate' &&
+              update.user != 'user1'
+            ) {
+              this.rtcPeerConnection.addIceCandidate(
+                new RTCIceCandidate(update.iceCandidate)
+              );
             }
           });
       } else {
@@ -84,13 +106,73 @@ export class VideoComponent {
             if (update.type == 'send-offer') {
               this.userSentOfferUpdate(update.offer);
             }
+
+            // if update is of sharing ice candidate and is not from the same user
+            // add the ice candidate
+            if (
+              update.type == 'sharing-ice-candidate' &&
+              update.user != 'user2'
+            ) {
+              if (!this.isFirstIce) {
+                this.isFirstIce = true;
+                this.rtcPeerConnection
+                  .setLocalDescription(this.localAnswer)
+                  .then(() => {
+                    this.rtcPeerConnection.addEventListener(
+                      'icecandidate',
+                      (event) => {
+                        if (event.candidate)
+                          this.sendIceCandidate(event.candidate, 'user2');
+                      }
+                    );
+                  });
+              }
+              this.rtcPeerConnection.addIceCandidate(
+                new RTCIceCandidate(update.iceCandidate)
+              );
+            }
           });
       }
     });
+    this.rtcPeerConnection.addEventListener(
+      'connectionstatechange',
+      (event: any) => {
+        if (this.rtcPeerConnection.connectionState === 'connected') {
+          if (this.roomJoiningStatus === 'created') {
+            this.dataShareService.sendMessageObs$.subscribe((message: any) => {
+              this.sendMessageToPeer(message);
+            });
+            this.dataChannel.addEventListener('open', (event) => {
+              this.dataChannel.addEventListener('message', (event) => {
+                this.messageHandler(event.data);
+              });
+            });
+          } else {
+            this.rtcPeerConnection.addEventListener(
+              'datachannel',
+              (event: any) => {
+                if (this.dataChannel == null) {
+                  this.dataChannel = event.channel;
+                  this.dataShareService.sendMessageObs$.subscribe(
+                    (message: any) => {
+                      this.sendMessageToPeer(message);
+                    }
+                  );
+                  this.dataChannel.addEventListener('open', (event) => {
+                    this.dataChannel.addEventListener('message', (event) => {
+                      this.messageHandler(event.data);
+                    });
+                  });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
   }
 
   userJoinedUpdate(): void {
-    this.addRemoteTrack();
     this.dataChannel = this.rtcPeerConnection.createDataChannel(
       'myDataChannel',
       {
@@ -98,9 +180,6 @@ export class VideoComponent {
         maxRetransmits: 100,
       }
     );
-    this.dataShareService.sendMessageObs$.subscribe((message: any) => {
-      this.sendMessageToPeer(message);
-    });
     this.sendOffer();
   }
 
@@ -109,27 +188,19 @@ export class VideoComponent {
       event.streams[0].getTracks().forEach((track) => {
         this.remoteStream.addTrack(track);
       });
+      this.remoteVideoTrack.nativeElement.srcObject = this.remoteStream;
     };
   }
 
   sendOffer(): void {
-    // Creating offer
     this.rtcPeerConnection.createOffer().then((offer) => {
-      // Setting  offer as localDescription
-      this.rtcPeerConnection.setLocalDescription(offer).then(() => {
-        // sending the offer to ws
-        this.messageService.sendMessage({
-          type: 'send-offer',
-          offer: offer,
-          roomId: this.roomId,
-        });
+      this.localOffer = offer;
+      this.messageService.sendMessage({
+        type: 'send-offer',
+        offer: offer,
+        roomId: this.roomId,
       });
     });
-  }
-
-  setAnswer(answer: any): Promise<void> {
-    const remoteDescription = new RTCSessionDescription(answer);
-    return this.rtcPeerConnection.setRemoteDescription(remoteDescription);
   }
 
   sendIceCandidate(iceCandidate: any, userName: string): void {
@@ -141,132 +212,47 @@ export class VideoComponent {
     });
   }
 
-  setRemoteVideoTrack(): void {
-    this.remoteVideoTrack.nativeElement.srcObject = this.remoteStream;
-    // console.log(this.remotePeerJoined);
-  }
-
   messageHandler(message: string): void {
     this.dataShareService.receiveMessage(message);
   }
 
   sendMessageToPeer(message: any): void {
-    const toStringObj: string = JSON.stringify(message);
-    this.dataChannel.send(toStringObj);
+    if (this.dataChannel.readyState == 'open') {
+      const toStringObj: string = JSON.stringify(message);
+      this.dataChannel.send(toStringObj);
+    }
   }
 
-  setOffer(offer: any): Promise<void> {
-    return this.rtcPeerConnection.setRemoteDescription(
-      new RTCSessionDescription(offer)
-    );
-  }
-
-  sendAnswer(): Promise<void> {
-    // Creating answer for the offer and setting it as localdescription
-    return this.rtcPeerConnection.createAnswer().then((answer) => {
-      this.rtcPeerConnection.setLocalDescription(answer).then(() => {
-        // sending the offer to peer.
-        this.messageService.sendMessage({
-          type: 'accept-offer',
-          offer: answer,
-          roomId: this.roomId,
-        });
+  sendAnswer(): void {
+    this.rtcPeerConnection.createAnswer().then((answer) => {
+      this.localAnswer = answer;
+      this.messageService.sendMessage({
+        type: 'accept-offer',
+        offer: answer,
+        roomId: this.roomId,
       });
     });
   }
 
   userAcceptedUpdate(answer: any): void {
-    // setting answer as remotedescription
-    this.setAnswer(answer).then(() => {
-      // ice logic
-      this.messageService
-        .getRoomUpdates()
-        .subscribe('/room/update/' + this.roomId, (update1: any) => {
-          update1 = JSON.parse(update1.body);
-          // if update is of sharing ice candidate and is not from the same user
-          // add the ice candidate
-          if (
-            update1.type == 'sharing-ice-candidate' &&
-            update1.user != 'user1'
-          ) {
-            this.rtcPeerConnection.addIceCandidate(update1.iceCandidate);
-          }
-        });
-      // Send your ice candidates to peer
+    this.localAnswer = answer;
+    this.rtcPeerConnection.setLocalDescription(this.localOffer).then(() => {
       this.rtcPeerConnection.addEventListener('icecandidate', (event) => {
-        this.sendIceCandidate(event.candidate, 'user1');
+        if (event.candidate) this.sendIceCandidate(event.candidate, 'user1');
       });
-      // When connection state changes to connected this event will fire
-      this.rtcPeerConnection.addEventListener(
-        'connectionstatechange',
-        (event: any) => {
-          if (this.rtcPeerConnection.connectionState === 'connected') {
-            this.remotePeerJoined = true;
-            this.setRemoteVideoTrack();
-
-            this.dataChannel.addEventListener('open', (event) => {
-              this.dataChannel.addEventListener('message', (event) => {
-                this.messageHandler(event.data);
-              });
-            });
-          }
-        }
-      );
+      this.addRemoteTrack();
+      this.rtcPeerConnection.setRemoteDescription(this.localAnswer).then(() => {
+        console.log('Remote description set');
+      });
     });
   }
 
   userSentOfferUpdate(offer: any): void {
+    this.localOffer = offer;
     this.addRemoteTrack();
-    this.setOffer(offer).then(() => {
-      this.sendAnswer().then(() => {
-        // ice logic
-        this.messageService
-          .getRoomUpdates()
-          .subscribe('/room/update/' + this.roomId, (update1: any) => {
-            // if update is of sharing ice candidate and is not from the same user
-            // add the ice candidate
-            update1 = JSON.parse(update1.body);
-            if (
-              update1.type == 'sharing-ice-candidate' &&
-              update1.user != 'user2'
-            ) {
-              this.rtcPeerConnection.addIceCandidate(update1.iceCandidate);
-            }
-          });
-        // send your ice candidates to peer.
-        this.rtcPeerConnection.addEventListener('icecandidate', (event) => {
-          if (event.candidate) {
-            this.sendIceCandidate(event.candidate, 'user2');
-          }
-        });
-        // when connectionstatechange event is fired
-        this.rtcPeerConnection.addEventListener(
-          'connectionstatechange',
-          (event: any) => {
-            if (this.rtcPeerConnection.connectionState === 'connected') {
-              this.remotePeerJoined = true;
-              this.setRemoteVideoTrack();
-
-              this.rtcPeerConnection.addEventListener(
-                'datachannel',
-                (event) => {
-                  this.dataChannel = event.channel;
-                  this.dataShareService.sendMessageObs$.subscribe(
-                    (message: any) => {
-                      this.sendMessageToPeer(message);
-                    }
-                  );
-                  this.dataChannel.addEventListener('open', (event: any) => {
-                    this.dataChannel.addEventListener('message', (event) => {
-                      this.messageHandler(event.data);
-                    });
-                  });
-                }
-              );
-            }
-          }
-        );
-      });
+    this.rtcPeerConnection.setRemoteDescription(offer).then(() => {
+      console.log('Remote description set');
+      this.sendAnswer();
     });
   }
 }

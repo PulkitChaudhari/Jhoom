@@ -53,7 +53,6 @@ export class DataShareService {
   }
 
   shareOtherPeerId(peerId: string) {
-    console.log(peerId);
     this.otherPeerId$.next(peerId);
   }
 
