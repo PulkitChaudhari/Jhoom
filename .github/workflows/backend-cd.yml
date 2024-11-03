@@ -1,15 +1,9 @@
-  name: Deploy Docker image to AWS ECS
+  name: Backend CD
   on:
     workflow_dispatch:
-      inputs: 
-        debug_enabled:
-          description: 'Run the workflow with debug logging'
-          required: false
-          type: boolean
-          default: false
   jobs:
     build:
-      name: Build
+      name: Deploying Backend image to AWS EC2
       runs-on: self-hosted
       steps:
         - name: Checkout
