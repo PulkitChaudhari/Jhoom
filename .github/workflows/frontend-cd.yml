@@ -1,0 +1,30 @@
+  name: Frontend CD
+  on:
+    workflow_dispatch:
+  jobs:
+    build:
+      name: Deploying docker image to AWS EC2
+      runs-on: self-hosted
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ap-south-1
+
+        - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+
+        - name: Pull latest image 
+          run: sudo docker pull 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
+
+        - name: Remove older image 
+          run: sudo docker rm -f jhoom-frontend-container || true
+
+        - name: Run Docker Container
+          run: sudo docker run -d --name jhoom-frontend-container 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
