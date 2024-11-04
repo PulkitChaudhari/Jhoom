@@ -21,7 +21,7 @@ export class MessageService {
 
   initializeWebSocketConnection(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const serverUrl = environment.app_url;
+      const serverUrl = environment.app_url + '/socket';
       const ws = new SockJS(serverUrl);
       this.stompClient = Stomp.over(ws);
       this.stompClient.connect(
@@ -57,14 +57,14 @@ export class MessageService {
   }
 
   createRoom(): Observable<any> {
-    return this.http.get('http://3.110.218.221:8080/createRoom', {
+    return this.http.get(environment.app_url + '/createRoom', {
       responseType: 'text',
     });
   }
 
   joinRoom(details: any, roomId: string): Observable<any> {
     return this.http.post(
-      'http://3.110.218.221:8080/joinRoom/' + roomId,
+      environment.app_url + '/joinRoom/' + roomId,
       JSON.stringify(details),
       {
         headers: {
@@ -75,7 +75,7 @@ export class MessageService {
   }
 
   getMessages(roomId: string): Observable<any> {
-    return this.http.get('http://3.110.218.221:8080/getMessages/' + roomId, {
+    return this.http.get(environment.app_url + '/getMessages/' + roomId, {
       responseType: 'text',
     });
   }
