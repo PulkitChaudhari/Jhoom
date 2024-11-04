@@ -27,4 +27,4 @@
           run: sudo docker rm -f jhoom-frontend-container || true
 
         - name: Run Docker Container
-          run: sudo docker run -d --name jhoom-frontend-container 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
+          run: sudo docker run -p 8085:80 -d --name jhoom-frontend-container 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
