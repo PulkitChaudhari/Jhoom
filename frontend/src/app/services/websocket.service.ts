@@ -57,14 +57,14 @@ export class MessageService {
   }
 
   createRoom(): Observable<any> {
-    return this.http.get('http://localhost:8080/createRoom', {
+    return this.http.get('http://3.110.218.221:8080/createRoom', {
       responseType: 'text',
     });
   }
 
   joinRoom(details: any, roomId: string): Observable<any> {
     return this.http.post(
-      'http://localhost:8080/joinRoom/' + roomId,
+      'http://3.110.218.221:8080/joinRoom/' + roomId,
       JSON.stringify(details),
       {
         headers: {
@@ -75,7 +75,7 @@ export class MessageService {
   }
 
   getMessages(roomId: string): Observable<any> {
-    return this.http.get('http://localhost:8080/getMessages/' + roomId, {
+    return this.http.get('http://3.110.218.221:8080/getMessages/' + roomId, {
       responseType: 'text',
     });
   }

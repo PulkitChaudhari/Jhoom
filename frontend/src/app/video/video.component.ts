@@ -241,9 +241,9 @@ export class VideoComponent {
         if (event.candidate) this.sendIceCandidate(event.candidate, 'user1');
       });
       this.addRemoteTrack();
-      this.rtcPeerConnection.setRemoteDescription(this.localAnswer).then(() => {
-        console.log('Remote description set');
-      });
+      this.rtcPeerConnection
+        .setRemoteDescription(this.localAnswer)
+        .then(() => {});
     });
   }
 
@@ -251,7 +251,6 @@ export class VideoComponent {
     this.localOffer = offer;
     this.addRemoteTrack();
     this.rtcPeerConnection.setRemoteDescription(offer).then(() => {
-      console.log('Remote description set');
       this.sendAnswer();
     });
   }
