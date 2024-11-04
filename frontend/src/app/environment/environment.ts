@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  app_url: 'http://localhost:8080/socket',
+  app_url: 'http://3.110.218.221:8080/socket',
 };
 
 /*
