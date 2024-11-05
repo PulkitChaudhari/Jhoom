@@ -1,0 +1,31 @@
+  name: Deploy Turnserver on AWS EC2
+  on:
+    workflow_dispatch:
+  jobs:
+    build:
+      name: Deploying Turnserver
+      runs-on: self-hosted
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
+        - name: Update OS repo versions
+          run: |
+            sudo apt-get update
+            sudo apt-get upgrade
+
+        - name: Install CoTurn
+          run: sudo apt-get install coturn
+
+        - name: Modify TurnServer configuration file
+          run: |
+            echo "listening-port=3478" > /etc/turnserver.conf
+            echo "external-ip=3.110.218.221" >> /etc/turnserver.conf
+            echo "user=pulkit:pulkit" >> /etc/turnserver.conf
+            echo "realm=jhoom.com" >> /etc/turnserver.conf
+            echo "sudo nano /etc/turnserver.conf" >> /etc/turnserver.conf
+
+        - name: Start CoTurn 
+          run: |
+            sudo systemctl start coturn
+            sudo systemctl enable coturn
