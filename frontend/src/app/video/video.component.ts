@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { DataShareService } from '../services/data.share.service';
 import { MessageService } from '../services/websocket.service';
-import { of } from 'rxjs';
+import { environment } from '../environment/environment';
 
 @Component({
   selector: 'app-video',
@@ -29,9 +29,9 @@ export class VideoComponent {
   private configuration = {
     iceServers: [
       {
-        urls: 'turn:43.204.217.171:3478',
-        username: 'pulkit',
-        credential: 'pulkit',
+        urls: environment.turnServerUrl,
+        username: environment.turnUsername,
+        credential: environment.turnPassword,
       },
     ],
   };
