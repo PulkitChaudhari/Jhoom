@@ -3,7 +3,7 @@
     workflow_dispatch:
   jobs:
     build:
-      name: Deploying docker image to AWS EC2
+      name: Deploying Frontend Image to AWS EC2
       runs-on: self-hosted
       steps:
         - name: Checkout
