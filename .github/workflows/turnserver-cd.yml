@@ -11,8 +11,8 @@
 
         - name: Update OS repo versions
           run: |
-            sudo apt-get update
-            sudo apt-get upgrade
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
 
         - name: Install CoTurn
           run: sudo apt-get install coturn
