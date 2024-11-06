@@ -3,7 +3,7 @@
     workflow_dispatch:
   jobs:
     Build:
-      name: Pushing docker image to AWS ECR
+      name: Pushing Backend Image to AWS ECR
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
