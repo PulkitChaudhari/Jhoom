@@ -1,4 +1,4 @@
-  name: turnserver-cd
+  name: Turnserver CD
   on:
     workflow_dispatch:
   jobs:
