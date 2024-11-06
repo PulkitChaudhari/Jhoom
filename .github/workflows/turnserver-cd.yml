@@ -1,4 +1,4 @@
-  name: Deploy Turnserver on AWS EC2
+  name: turnserver-cd
   on:
     workflow_dispatch:
   jobs:
