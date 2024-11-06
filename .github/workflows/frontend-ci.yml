@@ -3,7 +3,7 @@
     workflow_dispatch:
   jobs:
     Build:
-      name: Build
+      name: Deploying Frontend Image to AWS ECR
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
