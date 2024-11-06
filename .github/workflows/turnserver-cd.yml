@@ -23,7 +23,6 @@
             echo "external-ip=3.110.218.221" >> /etc/turnserver.conf
             echo "user=pulkit:pulkit" >> /etc/turnserver.conf
             echo "realm=jhoom1.com" >> /etc/turnserver.conf
-            echo "sudo nano /etc/turnserver.conf" >> /etc/turnserver.conf
 
         - name: Start CoTurn 
           run: |
