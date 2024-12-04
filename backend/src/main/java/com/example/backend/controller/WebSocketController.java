@@ -48,13 +48,13 @@ public class WebSocketController {
 
     @GetMapping("/createRoom")
     public ResponseEntity<String> createRoom() {
-        String newMeetingRoomId = MeetingRoomIdGenerator.generateMeetingRoomId();
+        String newMeetingRoomId = meetingRoomIdGenerator.generateMeetingRoomId();
         return new ResponseEntity<String>(newMeetingRoomId, HttpStatus.OK);
     }
 
     @PostMapping("/joinRoom/{roomId}")
-    public Boolean joinRoom() {
-        return true;
+    public Boolean joinRoom(@PathVariable String roomId) {
+        return this.meetingRoomIdGenerator.isRoomJoinable(roomId);
     }
 
     @GetMapping("/getMessage")

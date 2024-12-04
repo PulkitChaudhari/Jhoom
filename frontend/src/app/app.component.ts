@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { PeerService } from './services/peerjs.service';
 import { MessageService } from './services/websocket.service';
 import { Router } from '@angular/router';
 
@@ -9,16 +8,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  constructor(
-    private peerService: PeerService,
-    private messageService: MessageService,
-    private router: Router
-  ) {}
+  constructor(private messageService: MessageService, private router: Router) {}
 
   ngOnInit() {
     this.messageService.initializeWebSocketConnection().then(
       (value) => {
-        this.peerService.generatePeerId();
+        console.log('Websocket connected');
       },
       (value) => {
         console.log('Promise rejected');

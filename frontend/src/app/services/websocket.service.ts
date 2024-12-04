@@ -62,16 +62,12 @@ export class MessageService {
     });
   }
 
-  joinRoom(details: any, roomId: string): Observable<any> {
-    return this.http.post(
-      environment.app_url + '/joinRoom/' + roomId,
-      JSON.stringify(details),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+  joinRoom(roomId: string): Observable<any> {
+    return this.http.post(environment.app_url + '/joinRoom/' + roomId, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
   getMessages(roomId: string): Observable<any> {

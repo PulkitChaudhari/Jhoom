@@ -63,6 +63,17 @@ export class VideoComponent {
       this.roomJoiningStatus = obj.type;
       this.roomId = obj.roomId;
 
+      window.addEventListener('beforeunload', (event) => {
+        console.log('before unload event fired');
+        this.messageService.sendMessage({
+          roomId: this.roomId,
+          message: 'left the room',
+        });
+        this.userLeftTheRoom(
+          this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
+        );
+      });
+
       // If the room was created
       if (this.roomJoiningStatus == 'created') {
         this.messageService
@@ -138,6 +149,9 @@ export class VideoComponent {
       'connectionstatechange',
       (event: any) => {
         if (this.rtcPeerConnection.connectionState === 'connected') {
+          this.calltoastMessage(
+            'Another user has successfully joined the room'
+          );
           if (this.roomJoiningStatus === 'created') {
             this.dataShareService.sendMessageObs$.subscribe((message: any) => {
               this.sendMessageToPeer(message);
@@ -254,4 +268,8 @@ export class VideoComponent {
       this.sendAnswer();
     });
   }
+
+  userLeftTheRoom(user: string) {}
+
+  calltoastMessage(message: string) {}
 }

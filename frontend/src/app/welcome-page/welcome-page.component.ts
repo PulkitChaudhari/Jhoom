@@ -35,14 +35,12 @@ export class WelcomePageComponent implements OnInit {
   }
 
   joinRoom() {
-    // this.messageService.joinRoom().subscribe((roomId) => {
-    //   if (roomId) {
-    //     this.dataShareService.shareRoomId(roomId, 'created');
-    //     this.router.navigate(['room', roomId]);
-    //   }
-    // });
-    this.dataShareService.shareRoomId(this.roomId, 'joined');
-    this.router.navigate(['room', this.roomId]);
+    this.messageService.joinRoom(this.roomId).subscribe((resp) => {
+      if (resp) {
+        this.dataShareService.shareRoomId(this.roomId, 'joined');
+        this.router.navigate(['room', this.roomId]);
+      }
+    });
   }
 
   createRoom() {
@@ -53,4 +51,6 @@ export class WelcomePageComponent implements OnInit {
       }
     });
   }
+
+  toastButtonTest() {}
 }
