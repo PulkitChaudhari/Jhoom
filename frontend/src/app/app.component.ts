@@ -1,14 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from './services/websocket.service';
 import { Router } from '@angular/router';
+import { DataShareService } from './services/data.share.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
-  constructor(private messageService: MessageService, private router: Router) {}
+export class AppComponent implements OnInit, OnDestroy {
+  showToast: boolean = false;
+
+  title = 'Jhoom';
+
+  toasts: { title: string; message: string; show: boolean }[] = [];
+
+  constructor(
+    private messageService: MessageService,
+    private router: Router,
+    private dataShareService: DataShareService
+  ) {}
 
   ngOnInit() {
     this.messageService.initializeWebSocketConnection().then(
@@ -19,18 +30,24 @@ export class AppComponent implements OnInit {
         console.log('Promise rejected');
       }
     );
-  }
-
-  title = 'Jhoom';
-
-  htmlTag: HTMLElement | null;
-
-  switchTheme() {
-    this.htmlTag = document.getElementById('htmlTag');
-    this.htmlTag!.className = this.htmlTag?.className == 'dark' ? '' : 'dark';
+    this.dataShareService.showToastObs$.subscribe((toast) => {
+      if (toast?.title !== undefined) this.addToast(toast);
+    });
   }
 
   navigateToWelcomePage() {
     this.router.navigate(['welcome']);
   }
+
+  addToast(toast: any) {
+    this.toasts.push(toast);
+    setTimeout(() => (toast.show = true), 100);
+  }
+
+  removeToast(index: number) {
+    this.toasts[index].show = false;
+    setTimeout(() => this.toasts.splice(index, 1), 0);
+  }
+
+  ngOnDestroy() {}
 }

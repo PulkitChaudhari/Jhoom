@@ -13,6 +13,7 @@ export class DataShareService {
   private peerId$ = new BehaviorSubject<any>({});
   private otherPeerId$ = new BehaviorSubject<any>({});
   private joinorCreate$ = new BehaviorSubject<any>({});
+  private showToast$ = new BehaviorSubject<any>({});
 
   prevMessagesObs$ = this.prevMessages$.asObservable();
   receiveMessageObs$ = this.receiveMessage$.asObservable();
@@ -23,6 +24,7 @@ export class DataShareService {
   peerIdObs$ = this.peerId$.asObservable();
   otherPeerIdObs$ = this.otherPeerId$.asObservable();
   joinorCreateObs$ = this.joinorCreate$.asObservable();
+  showToastObs$ = this.showToast$.asObservable();
 
   addMessage(messageDetails: any) {
     this.prevMessages$.next(messageDetails);
@@ -58,5 +60,9 @@ export class DataShareService {
 
   shareRoomJoiningStatus(status: 'join' | 'create') {
     this.joinorCreate$.next(status);
+  }
+
+  shareToastMessage(title: string, message: string) {
+    this.showToast$.next({ title: title, message: message });
   }
 }

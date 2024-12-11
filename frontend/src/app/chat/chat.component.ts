@@ -47,5 +47,6 @@ export class ChatComponent implements OnInit {
       });
       this.input = '';
     }
+    this.dataShareService.shareToastMessage('hello ', 'world');
   }
 }
