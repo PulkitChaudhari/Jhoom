@@ -2,6 +2,7 @@
   <div class="fixed top-0 dark:bg-slate-800 w-screen h-14 grid grid-cols-3">
     <div class="items-center justify-start flex">
       <button
+        *ngIf="displayBackButton"
         class="rounded-full w-fit px-4 ml-5 bg-cyan-600 text-white"
         (click)="navigateToWelcomePage()"
       >
@@ -49,6 +50,7 @@
         style="display: flex; gap: 5px; align-items: center"
       >
         <a
+          target="_blank"
           class="italic text-white text-decoration-none"
           href="https://www.linkedin.com/in/pc1201/"
         >
@@ -70,16 +72,24 @@
         class="italic text-white ml-2"
         style="display: flex; gap: 5px; align-items: center"
       >
-        <a href="https://github.com/PulkitChaudhari">
+        <a
+          target="_blank"
+          href="mailto:pulkitchaudhari@gmail.com"
+          style="display: flex; justify-content: center; align-items: center"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
-            viewBox="0 0 24 24"
             fill="white"
+            class="bi bi-envelope-at"
+            viewBox="0 0 16 16"
           >
             <path
-              d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.3 9.4 7.88 10.93.58.1.79-.25.79-.56v-2.15c-3.2.7-3.88-1.54-3.88-1.54-.52-1.3-1.26-1.65-1.26-1.65-1.03-.7.08-.69.08-.69 1.14.08 1.74 1.17 1.74 1.17 1.01 1.73 2.65 1.23 3.3.94.1-.73.4-1.23.72-1.5-2.55-.3-5.23-1.28-5.23-5.7 0-1.26.45-2.28 1.17-3.08-.1-.29-.5-1.48.1-3.07 0 0 .95-.3 3.1 1.17.9-.25 1.86-.37 2.83-.37.96 0 1.93.12 2.83.37 2.15-1.47 3.1-1.17 3.1-1.17.6 1.59.2 2.78.1 3.07.72.8 1.17 1.82 1.17 3.08 0 4.43-2.69 5.4-5.25 5.7.42.37.77 1.08.77 2.18v3.23c0 .31.2.67.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"
+              d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"
+            />
+            <path
+              d="M14.247 14.269c1.01 0 1.587-.857 1.587-2.025v-.21C15.834 10.43 14.64 9 12.52 9h-.035C10.42 9 9 10.36 9 12.432v.214C9 14.82 10.438 16 12.358 16h.044c.594 0 1.018-.074 1.237-.175v-.73c-.245.11-.673.18-1.18.18h-.044c-1.334 0-2.571-.788-2.571-2.655v-.157c0-1.657 1.058-2.724 2.64-2.724h.04c1.535 0 2.484 1.05 2.484 2.326v.118c0 .975-.324 1.39-.639 1.39-.232 0-.41-.148-.41-.42v-2.19h-.906v.569h-.03c-.084-.298-.368-.63-.954-.63-.778 0-1.259.555-1.259 1.4v.528c0 .892.49 1.434 1.26 1.434.471 0 .896-.227 1.014-.643h.043c.118.42.617.648 1.12.648m-2.453-1.588v-.227c0-.546.227-.791.573-.791.297 0 .572.192.572.708v.367c0 .573-.253.744-.564.744-.354 0-.581-.215-.581-.8Z"
             />
           </svg>
         </a>

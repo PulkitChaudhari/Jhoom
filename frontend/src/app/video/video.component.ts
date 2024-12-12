@@ -37,6 +37,7 @@ export class VideoComponent {
   };
 
   async ngOnInit(): Promise<void> {
+    console.log(this.remoteVideoTrack);
     // Getting MediaStream of video and audio for local user
     const stream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
@@ -53,10 +54,6 @@ export class VideoComponent {
     stream.getTracks().forEach((track) => {
       this.rtcPeerConnection.addTrack(track, stream);
     });
-
-    this.rtcPeerConnection.ontrack = (event) => {
-      console.log(event);
-    };
 
     // Waiting to get updates whether localuser has joined a room or created one
     this.dataShareService.roomIdObs$.subscribe((obj) => {
@@ -86,6 +83,22 @@ export class VideoComponent {
               this.userLeftTheRoom(
                 this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
               );
+
+              this.rtcPeerConnection.close();
+
+              this.remoteVideoTrack.nativeElement.srcObject = null;
+
+              this.remoteStream = new MediaStream();
+
+              // creating new rtcpeerconnection obj
+              this.rtcPeerConnection = new RTCPeerConnection(
+                this.configuration
+              );
+
+              // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
+              stream.getTracks().forEach((track) => {
+                this.rtcPeerConnection.addTrack(track, stream);
+              });
             }
 
             // When a user joins
@@ -125,6 +138,24 @@ export class VideoComponent {
                 'Left',
                 'user has left the room'
               );
+              this.userLeftTheRoom(
+                this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
+              );
+              this.rtcPeerConnection.close();
+
+              this.remoteVideoTrack.nativeElement.srcObject = null;
+
+              this.remoteStream = new MediaStream();
+
+              // creating new rtcpeerconnection obj
+              this.rtcPeerConnection = new RTCPeerConnection(
+                this.configuration
+              );
+
+              // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
+              stream.getTracks().forEach((track) => {
+                this.rtcPeerConnection.addTrack(track, stream);
+              });
             }
 
             // if update is of offer being sent
@@ -286,4 +317,8 @@ export class VideoComponent {
   userLeftTheRoom(user: string) {}
 
   calltoastMessage(message: string) {}
+
+  getvideoinfo() {
+    console.log(this.remoteVideoTrack.nativeElement.srcObject);
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from './services/websocket.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { DataShareService } from './services/data.share.service';
 
 @Component({
@@ -12,6 +12,8 @@ export class AppComponent implements OnInit, OnDestroy {
   showToast: boolean = false;
 
   title = 'Jhoom';
+
+  displayBackButton: boolean = false;
 
   toasts: { title: string; message: string; show: boolean }[] = [];
 
@@ -32,6 +34,11 @@ export class AppComponent implements OnInit, OnDestroy {
     );
     this.dataShareService.showToastObs$.subscribe((toast) => {
       if (toast?.title !== undefined) this.addToast(toast);
+    });
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.displayBackButton = event.urlAfterRedirects.includes('room');
+      }
     });
   }
 
