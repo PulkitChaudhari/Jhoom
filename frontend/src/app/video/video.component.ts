@@ -67,11 +67,8 @@ export class VideoComponent {
         console.log('before unload event fired');
         this.messageService.sendMessage({
           roomId: this.roomId,
-          message: 'left the room',
+          type: 'left',
         });
-        this.userLeftTheRoom(
-          this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
-        );
       });
 
       // If the room was created
@@ -80,6 +77,16 @@ export class VideoComponent {
           .getRoomUpdates()
           .subscribe('/room/update/' + this.roomId, async (update: any) => {
             update = JSON.parse(update.body);
+
+            if (update.type == 'left') {
+              this.dataShareService.shareToastMessage(
+                'Left',
+                'user has left the room'
+              );
+              this.userLeftTheRoom(
+                this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
+              );
+            }
 
             // When a user joins
             if (update.type == 'joined') {
@@ -112,6 +119,13 @@ export class VideoComponent {
           .getRoomUpdates()
           .subscribe('/room/update/' + this.roomId, async (update: any) => {
             update = JSON.parse(update.body);
+
+            if (update.type == 'left') {
+              this.dataShareService.shareToastMessage(
+                'Left',
+                'user has left the room'
+              );
+            }
 
             // if update is of offer being sent
             if (update.type == 'send-offer') {

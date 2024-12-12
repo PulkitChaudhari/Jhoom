@@ -4,23 +4,24 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
 
 @Service
 public class MeetingRoomIdGenerator {
 
-    private Set<String> userUpRooms;
+//    private Set<String> userUpRooms;
+
+    private HashMap<String, Integer> userUpRooms;
 
     MeetingRoomIdGenerator() {
-        this.userUpRooms = new HashSet<>();
+        this.userUpRooms = new HashMap<>();
     }
 
     public String generateMeetingRoomId() {
         String meetingRoomId = String.valueOf(System.currentTimeMillis());
         String md5Hash = generateMD5Hash(meetingRoomId);
         String truncatedHash = truncateHash(md5Hash, 8);
-        this.userUpRooms.add(truncatedHash);
+        this.userUpRooms.put(truncatedHash, 1);
         return truncatedHash;
     }
 
@@ -45,7 +46,6 @@ public class MeetingRoomIdGenerator {
     }
 
     public Boolean isRoomJoinable(String roomId) {
-        System.out.println(this.userUpRooms.contains(roomId));
-        return this.userUpRooms.contains(roomId);
+        return this.userUpRooms.containsKey(roomId);
     }
 }

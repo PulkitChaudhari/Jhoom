@@ -35,12 +35,23 @@ export class WelcomePageComponent implements OnInit {
   }
 
   joinRoom() {
-    this.messageService.joinRoom(this.roomId).subscribe((resp) => {
-      if (resp) {
-        this.dataShareService.shareRoomId(this.roomId, 'joined');
-        this.router.navigate(['room', this.roomId]);
-      }
-    });
+    if (this.roomId == '')
+      this.dataShareService.shareToastMessage(
+        'Please enter Room Id',
+        'Room Id field cannot be blank'
+      );
+    else {
+      this.messageService.joinRoom(this.roomId).subscribe((resp) => {
+        if (resp) {
+          this.dataShareService.shareRoomId(this.roomId, 'joined');
+          this.router.navigate(['room', this.roomId]);
+        } else
+          this.dataShareService.shareToastMessage(
+            'Incorrect Room Id',
+            'No room is created with this Room Id, please enter correct Room Id'
+          );
+      });
+    }
   }
 
   createRoom() {

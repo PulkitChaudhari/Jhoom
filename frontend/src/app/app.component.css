@@ -7,3 +7,7 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+p {
+  margin-bottom: 0rem !important;
+}
