@@ -16,9 +16,15 @@
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ap-south-1
 
-        - name: Login to Amazon ECR
-          id: login-ecr
-          uses: aws-actions/amazon-ecr-login@v1
+        # - name: Login to Amazon ECR
+        #   id: login-ecr
+        #   uses: aws-actions/amazon-ecr-login@v1
+
+        - name: Native docker ECR login
+          id: docker-ecr-login
+          run: |
+            result=$(aws ecr get-login-password --region | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
+            echo "Login Result: $result"
 
         - name: Pull latest image 
           run: sudo docker pull 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
