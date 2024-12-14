@@ -18,7 +18,7 @@
 
         - name: Login to Amazon ECR
           id: login-ecr
-          uses: aws-actions/amazon-ecr-login@v1
+          uses: aws-actions/amazon-ecr-login@v2
 
         - name: Pull latest image 
           run: sudo docker pull 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/helm-jhoom:latest
