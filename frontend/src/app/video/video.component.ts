@@ -37,29 +37,18 @@ export class VideoComponent {
   };
 
   async ngOnInit(): Promise<void> {
-    console.log(this.remoteVideoTrack);
-    // Getting MediaStream of video and audio for local user
     const stream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
     });
-
-    // Assigning local user video and audio to html
     this.localVideoTrack.nativeElement.srcObject = stream;
-
-    // creating new rtcpeerconnection obj
     this.rtcPeerConnection = new RTCPeerConnection(this.configuration);
-
-    // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
     stream.getTracks().forEach((track) => {
       this.rtcPeerConnection.addTrack(track, stream);
     });
-
-    // Waiting to get updates whether localuser has joined a room or created one
     this.dataShareService.roomIdObs$.subscribe((obj) => {
       this.roomJoiningStatus = obj.type;
       this.roomId = obj.roomId;
-
       window.addEventListener('beforeunload', (event) => {
         console.log('before unload event fired');
         this.messageService.sendMessage({
@@ -67,168 +56,13 @@ export class VideoComponent {
           type: 'left',
         });
       });
-
-      // If the room was created
       if (this.roomJoiningStatus == 'created') {
-        this.messageService
-          .getRoomUpdates()
-          .subscribe('/room/update/' + this.roomId, async (update: any) => {
-            update = JSON.parse(update.body);
-
-            if (update.type == 'left') {
-              this.dataShareService.shareToastMessage(
-                'Left',
-                'user has left the room'
-              );
-              this.userLeftTheRoom(
-                this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
-              );
-
-              this.rtcPeerConnection.close();
-
-              this.remoteVideoTrack.nativeElement.srcObject = null;
-
-              this.remoteStream = new MediaStream();
-
-              // creating new rtcpeerconnection obj
-              this.rtcPeerConnection = new RTCPeerConnection(
-                this.configuration
-              );
-
-              // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
-              stream.getTracks().forEach((track) => {
-                this.rtcPeerConnection.addTrack(track, stream);
-              });
-            }
-
-            // When a user joins
-            if (update.type == 'joined') {
-              this.userJoinedUpdate();
-            }
-
-            // if the peer accepts offer and sends answer
-            if (update.type == 'accept-offer') {
-              this.userAcceptedUpdate(update.offer);
-            }
-
-            // if update is of sharing ice candidate and is not from the same user
-            // add the ice candidate
-            if (
-              update.type == 'sharing-ice-candidate' &&
-              update.user != 'user1'
-            ) {
-              this.rtcPeerConnection.addIceCandidate(
-                new RTCIceCandidate(update.iceCandidate)
-              );
-            }
-          });
+        this.roomCreatorRTC(stream);
       } else {
-        // sending message to ws that u have joined
-        this.messageService.sendMessage({
-          type: 'joined',
-          roomId: this.roomId,
-        });
-        this.messageService
-          .getRoomUpdates()
-          .subscribe('/room/update/' + this.roomId, async (update: any) => {
-            update = JSON.parse(update.body);
-
-            if (update.type == 'left') {
-              this.dataShareService.shareToastMessage(
-                'Left',
-                'user has left the room'
-              );
-              this.userLeftTheRoom(
-                this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
-              );
-              this.rtcPeerConnection.close();
-
-              this.remoteVideoTrack.nativeElement.srcObject = null;
-
-              this.remoteStream = new MediaStream();
-
-              // creating new rtcpeerconnection obj
-              this.rtcPeerConnection = new RTCPeerConnection(
-                this.configuration
-              );
-
-              // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
-              stream.getTracks().forEach((track) => {
-                this.rtcPeerConnection.addTrack(track, stream);
-              });
-            }
-
-            // if update is of offer being sent
-            if (update.type == 'send-offer') {
-              this.userSentOfferUpdate(update.offer);
-            }
-
-            // if update is of sharing ice candidate and is not from the same user
-            // add the ice candidate
-            if (
-              update.type == 'sharing-ice-candidate' &&
-              update.user != 'user2'
-            ) {
-              if (!this.isFirstIce) {
-                this.isFirstIce = true;
-                this.rtcPeerConnection
-                  .setLocalDescription(this.localAnswer)
-                  .then(() => {
-                    this.rtcPeerConnection.addEventListener(
-                      'icecandidate',
-                      (event) => {
-                        if (event.candidate)
-                          this.sendIceCandidate(event.candidate, 'user2');
-                      }
-                    );
-                  });
-              }
-              this.rtcPeerConnection.addIceCandidate(
-                new RTCIceCandidate(update.iceCandidate)
-              );
-            }
-          });
+        this.roomJoinerRTC(stream);
       }
     });
-    this.rtcPeerConnection.addEventListener(
-      'connectionstatechange',
-      (event: any) => {
-        if (this.rtcPeerConnection.connectionState === 'connected') {
-          this.calltoastMessage(
-            'Another user has successfully joined the room'
-          );
-          if (this.roomJoiningStatus === 'created') {
-            this.dataShareService.sendMessageObs$.subscribe((message: any) => {
-              this.sendMessageToPeer(message);
-            });
-            this.dataChannel.addEventListener('open', (event) => {
-              this.dataChannel.addEventListener('message', (event) => {
-                this.messageHandler(event.data);
-              });
-            });
-          } else {
-            this.rtcPeerConnection.addEventListener(
-              'datachannel',
-              (event: any) => {
-                if (this.dataChannel == null) {
-                  this.dataChannel = event.channel;
-                  this.dataShareService.sendMessageObs$.subscribe(
-                    (message: any) => {
-                      this.sendMessageToPeer(message);
-                    }
-                  );
-                  this.dataChannel.addEventListener('open', (event) => {
-                    this.dataChannel.addEventListener('message', (event) => {
-                      this.messageHandler(event.data);
-                    });
-                  });
-                }
-              }
-            );
-          }
-        }
-      }
-    );
+    this.addConnectedEventListener();
   }
 
   userJoinedUpdate(): void {
@@ -320,5 +154,160 @@ export class VideoComponent {
 
   getvideoinfo() {
     console.log(this.remoteVideoTrack.nativeElement.srcObject);
+  }
+
+  roomCreatorRTC(stream: MediaStream) {
+    this.messageService
+      .getRoomUpdates()
+      .subscribe('/room/update/' + this.roomId, async (update: any) => {
+        update = JSON.parse(update.body);
+
+        if (update.type == 'left') {
+          this.dataShareService.shareToastMessage(
+            'Left',
+            'user has left the room'
+          );
+          this.userLeftTheRoom(
+            this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
+          );
+
+          this.rtcPeerConnection.close();
+
+          this.remoteVideoTrack.nativeElement.srcObject = null;
+
+          this.remoteStream = new MediaStream();
+
+          // creating new rtcpeerconnection obj
+          this.rtcPeerConnection = new RTCPeerConnection(this.configuration);
+
+          // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
+          stream.getTracks().forEach((track) => {
+            this.rtcPeerConnection.addTrack(track, stream);
+          });
+        }
+
+        // When a user joins
+        if (update.type == 'joined') {
+          this.userJoinedUpdate();
+        }
+
+        // if the peer accepts offer and sends answer
+        if (update.type == 'accept-offer') {
+          this.userAcceptedUpdate(update.offer);
+        }
+
+        // if update is of sharing ice candidate and is not from the same user
+        // add the ice candidate
+        if (update.type == 'sharing-ice-candidate' && update.user != 'user1') {
+          this.rtcPeerConnection.addIceCandidate(
+            new RTCIceCandidate(update.iceCandidate)
+          );
+        }
+      });
+  }
+
+  roomJoinerRTC(stream: MediaStream) {
+    // sending message to ws that u have joined
+    this.messageService.sendMessage({
+      type: 'joined',
+      roomId: this.roomId,
+    });
+    this.messageService
+      .getRoomUpdates()
+      .subscribe('/room/update/' + this.roomId, async (update: any) => {
+        update = JSON.parse(update.body);
+
+        if (update.type == 'left') {
+          this.dataShareService.shareToastMessage(
+            'Left',
+            'user has left the room'
+          );
+          this.userLeftTheRoom(
+            this.roomJoiningStatus == 'created' ? 'creator' : 'joiner'
+          );
+          this.rtcPeerConnection.close();
+
+          this.remoteVideoTrack.nativeElement.srcObject = null;
+
+          this.remoteStream = new MediaStream();
+
+          // creating new rtcpeerconnection obj
+          this.rtcPeerConnection = new RTCPeerConnection(this.configuration);
+
+          // Setting localuser's video and audio in rtcpeerconnection obj to later be accessed by remote user.
+          stream.getTracks().forEach((track) => {
+            this.rtcPeerConnection.addTrack(track, stream);
+          });
+        }
+
+        // if update is of offer being sent
+        if (update.type == 'send-offer') {
+          this.userSentOfferUpdate(update.offer);
+        }
+
+        // if update is of sharing ice candidate and is not from the same user
+        // add the ice candidate
+        if (update.type == 'sharing-ice-candidate' && update.user != 'user2') {
+          if (!this.isFirstIce) {
+            this.isFirstIce = true;
+            this.rtcPeerConnection
+              .setLocalDescription(this.localAnswer)
+              .then(() => {
+                this.rtcPeerConnection.addEventListener(
+                  'icecandidate',
+                  (event) => {
+                    if (event.candidate)
+                      this.sendIceCandidate(event.candidate, 'user2');
+                  }
+                );
+              });
+          }
+          this.rtcPeerConnection.addIceCandidate(
+            new RTCIceCandidate(update.iceCandidate)
+          );
+        }
+      });
+  }
+
+  addConnectedEventListener() {
+    this.rtcPeerConnection.addEventListener(
+      'connectionstatechange',
+      (event: any) => {
+        if (this.rtcPeerConnection.connectionState === 'connected') {
+          this.calltoastMessage(
+            'Another user has successfully joined the room'
+          );
+          if (this.roomJoiningStatus === 'created') {
+            this.dataShareService.sendMessageObs$.subscribe((message: any) => {
+              this.sendMessageToPeer(message);
+            });
+            this.dataChannel.addEventListener('open', (event) => {
+              this.dataChannel.addEventListener('message', (event) => {
+                this.messageHandler(event.data);
+              });
+            });
+          } else {
+            this.rtcPeerConnection.addEventListener(
+              'datachannel',
+              (event: any) => {
+                if (this.dataChannel == null) {
+                  this.dataChannel = event.channel;
+                  this.dataShareService.sendMessageObs$.subscribe(
+                    (message: any) => {
+                      this.sendMessageToPeer(message);
+                    }
+                  );
+                  this.dataChannel.addEventListener('open', (event) => {
+                    this.dataChannel.addEventListener('message', (event) => {
+                      this.messageHandler(event.data);
+                    });
+                  });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
   }
 }
