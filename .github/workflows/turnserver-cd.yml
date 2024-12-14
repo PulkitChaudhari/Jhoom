@@ -19,6 +19,7 @@
 
         - name: Modify TurnServer configuration file
           run: |
+            sudo su
             echo "listening-port=3478" > /etc/turnserver.conf
             echo "external-ip=3.110.218.221" >> /etc/turnserver.conf
             echo "user=pulkit:pulkit" >> /etc/turnserver.conf
