@@ -15,7 +15,7 @@
             sudo apt-get upgrade -y
 
         - name: Install CoTurn
-          run: sudo apt-get install coturn
+          run: sudo apt-get install coturn -y
 
         - name: Modify TurnServer configuration file
           run: |
@@ -26,5 +26,5 @@
 
         - name: Start CoTurn 
           run: |
-            sudo systemctl start coturn
-            sudo systemctl enable coturn
+            sudo systemctl start coturn -y
+            sudo systemctl enable coturn -y
