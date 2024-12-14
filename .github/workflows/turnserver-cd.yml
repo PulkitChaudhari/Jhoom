@@ -15,7 +15,7 @@
             sudo apt-get upgrade -y
 
         - name: Install CoTurn
-          run: sudo apt-get install coturn -y
+          run: sudo apt-get install coturn -Y
 
         - name: Modify TurnServer configuration file
           run: |
