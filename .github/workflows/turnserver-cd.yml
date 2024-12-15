@@ -13,17 +13,16 @@
           run: |
             sudo apt-get update -y
             sudo apt-get upgrade -y
-
         - name: Install CoTurn
-          run: sudo apt-get install coturn
+          run: echo "Y" | sudo apt-get install coturn
 
         - name: Modify TurnServer configuration file
           run: |
+            sudo chmod -R o+rw /etc/turnserver.conf
             echo "listening-port=3478" > /etc/turnserver.conf
             echo "external-ip=3.110.218.221" >> /etc/turnserver.conf
             echo "user=pulkit:pulkit" >> /etc/turnserver.conf
             echo "realm=jhoom1.com" >> /etc/turnserver.conf
-
         - name: Start CoTurn 
           run: |
             sudo systemctl start coturn
