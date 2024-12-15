@@ -1,4 +1,4 @@
-# Make sure Docker is installed already on EC2 Instance
+# Make sure Docker is installed already on EC2 Instance and AWS CLI v2 is installed
   name: Backend CD
   on:
     workflow_dispatch:
