@@ -1,9 +1,10 @@
+
   name: Frontend CD
   on:
     workflow_dispatch:
   jobs:
     build:
-      name: Deploying Frontend Image to AWS EC2
+      name: Deploying docker image to AWS EC2
       runs-on: self-hosted
       steps:
         - name: Checkout
@@ -17,16 +18,8 @@
             aws-region: ap-south-1
 
         - name: Login to Amazon ECR
-          id: ecr-login
-          run: |
-              aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 715841355249.dkr.ecr.ap-south-1.amazonaws.com
-
-
-        # - name: Native docker ECR login
-        #   id: docker-ecr-login
-        #   run: |
-        #     result=$(aws ecr get-login-password --region | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
-        #     echo "Login Result: $result"
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
 
         - name: Pull latest image 
           run: sudo docker pull 715841355249.dkr.ecr.ap-south-1.amazonaws.com/glokelov/jhoom-frontend:latest
