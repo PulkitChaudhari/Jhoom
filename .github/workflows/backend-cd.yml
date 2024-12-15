@@ -1,4 +1,5 @@
 # Make sure Docker is installed already on EC2 Instance and AWS CLI v2 is installed
+# Also make sure ec2 ip is configured in websocketconfig
   name: Backend CD
   on:
     workflow_dispatch:
