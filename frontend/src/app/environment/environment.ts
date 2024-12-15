@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  app_url: 'http://localhost:8080',
-  turnServerUrl: 'turn:3.109.121.160',
+  app_url: 'http://3.109.211.39:8080',
+  turnServerUrl: 'turn:3.109.211.39',
   turnUsername: 'pulkit',
   turnPassword: 'pulkit',
 };
